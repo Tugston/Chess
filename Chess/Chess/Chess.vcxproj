@@ -133,7 +133,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="src\Game\Game.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Core\Shader.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Core\Window.cpp" />
+    <ClCompile Include="src\Game\Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Game\Game.h" />
+    <ClInclude Include="src\Game\Input.h" />
+    <ClInclude Include="src\GraphicsEngine\Core\Macros.h" />
+    <ClInclude Include="src\GraphicsEngine\Core\Shader.h" />
+    <ClInclude Include="src\GraphicsEngine\Core\Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\GraphicsEngine\Shaders\Frag\BoardFrag.txt" />
+    <Text Include="src\GraphicsEngine\Shaders\Vertex\BoardVertex.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
