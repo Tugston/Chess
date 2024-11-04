@@ -1,6 +1,9 @@
 #include "Shader.h"
 
 #include<GL/glew.h>
+#include<glm.hpp>
+#include<gtc/matrix_transform.hpp>
+#include<gtc/type_ptr.hpp>
 
 #include<fstream>
 #include<iostream>
@@ -14,6 +17,16 @@ GraphicsEngine::Shader::Shader(const std::string& vertexFilePath, const std::str
 void GraphicsEngine::Shader::Use()
 {
 	glUseProgram(program);
+}
+
+void GraphicsEngine::Shader::SetUniformMat4(const glm::mat4& x, const std::string& name)
+{
+	glUniformMatrix4fv(glGetUniformLocation(program, name.c_str()), 1, GL_FALSE, glm::value_ptr(x));
+}
+
+void GraphicsEngine::Shader::SetUniformVec4(const glm::vec4& x, const std::string& name)
+{
+	glUniform4fv(glGetUniformLocation(program, name.c_str()), 1, glm::value_ptr(x));
 }
 
 GraphicsEngine::ShaderProgramSource GraphicsEngine::Shader::ParseShader(const std::string& vertexFilePath, const std::string& fragFilePath)
@@ -63,6 +76,7 @@ GraphicsEngine::ShaderProgramSource GraphicsEngine::Shader::ParseShader(const st
 
 int GraphicsEngine::Shader::CompileShader(unsigned int type, const std::string& src)
 {
+	//create and compile shader in gl
 	std::cout << src << "\n\n";
 	const char* source = src.c_str();
 	unsigned int id = glCreateShader(type);

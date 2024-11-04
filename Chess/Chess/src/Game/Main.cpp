@@ -5,5 +5,4 @@ int SDL_main(int argc, char *argv[]) {
 	ChessGame->Start();
 	return 0;
 }
-
 //ENTRY POINT//
