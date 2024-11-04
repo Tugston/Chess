@@ -11,6 +11,7 @@ namespace Chess {
 	public:
 		Board();
 
+		void SetupBuffer();
 		void Draw();
 
 		//getters

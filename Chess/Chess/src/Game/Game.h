@@ -21,6 +21,7 @@
 #include "../GraphicsEngine/Core/Window.h"
 #include "../GraphicsEngine/Core/Shader.h"
 #include "../GraphicsEngine/Core/Drawable.h"
+#include "../GraphicsEngine/Core/SpriteRenderer.h"
 
 //________Component INCLUDES_________
 #include "../GraphicsEngine/Components/Camera.h"
@@ -69,6 +70,7 @@ namespace Chess {
 		GraphicsEngine::Camera* camera;
 
 		Chess::Board* board;
+		GraphicsEngine::SpriteRenderer* spriteRenderer;
 
 		std::vector<GraphicsEngine::Drawable*> drawables;
 

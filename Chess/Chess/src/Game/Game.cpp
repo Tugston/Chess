@@ -6,17 +6,10 @@
 using namespace Chess;
 
 Game::Game() : quit(false){
+
+	//lightweight gl classes are created on constructor
 	window = new GraphicsEngine::Window();
-
-	//shader = new GraphicsEngine::Shader("src/GraphicsEngine/Shaders/Vertex/BoardVertex.txt",
-		//"src/GraphicsEngine/Shaders/Frag/BoardFrag.txt");
-
 	camera = new GraphicsEngine::Camera;
-	
-	//board has gameplay material, so need a direct pointer as well as pushing it into the drawables
-	//in order to be drawn
-	board = new Board;
-	drawables.push_back(board);
 
 	model = glm::translate(model, glm::vec3(.5f, .5f, -1.0f));
 	model = glm::rotate(model, glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f));
@@ -38,30 +31,22 @@ Game::~Game()
 
 void Game::Start()
 {
-	//std::cout << glGetString(GL_VERSION);
 
-	//shader->Use();
+	//heavier using gl classes created on start
 	
-	/*
-	glCheck(glGenVertexArrays(1, &vao));
-	glCheck(glGenBuffers(1, &vbo));
-	glCheck(glGenBuffers(1, &ebo));
+	//board has gameplay material, so need a direct pointer as well as pushing it into the drawables
+	//in order to be drawn
+	board = new Board;
+	drawables.push_back(board);
 
-	glCheck(glBindVertexArray(vao));
+	spriteRenderer = new GraphicsEngine::SpriteRenderer;
 
-	glCheck(glBindBuffer(GL_ARRAY_BUFFER, vbo));
-	glCheck(glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(float), vertexData.data(), GL_STATIC_DRAW));
+	for (int i = 0; i < 32; i++) {
+		spriteRenderer->AddSpriteData(glm::vec2(1 + i, 1 + i));
+	}
 
-	glCheck(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-	glCheck(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(float), indices.data(), GL_STATIC_DRAW));
-	
-	glCheck(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
-	glCheck(glEnableVertexAttribArray(0));
-
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	*/
+	spriteRenderer->SetupBuffer();
+	drawables.push_back(spriteRenderer);
 
 	Tick();
 }
@@ -72,22 +57,12 @@ void Game::Draw(Uint32 DeltaTime)
 	glClearColor(.48f, .85f, 1.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-
-
-	//shader->SetUniformMat4(camera->GetViewMatrix(), "view");
-	//shader->SetUniformMat4(camera->projection, "projection");
-	//shader->SetUniformMat4(model, "model");
-
-	//glBindVertexArray(vao);
-
-	//glCheck(glBindVertexArray(vao));
-	//glCheck(glBindBuffer(GL_ARRAY_BUFFER, vbo));
-	//glCheck(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
-	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
 	for (int i = 0; i < drawables.size(); i++)
 	{
+
+		//can't bind shader in draw call in the class because I have to set the uniforms here,
+		//and it needs camera data to properly configure them and I do not want to pass the camera
+		//to the base drawable just for this
 		drawables.at(i)->GetShader()->Use();
 
 		drawables.at(i)->GetShader()->SetUniformMat4(camera->GetViewMatrix(), "view");

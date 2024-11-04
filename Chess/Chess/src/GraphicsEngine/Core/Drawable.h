@@ -13,6 +13,10 @@ namespace GraphicsEngine {
 	public:
 		Drawable();
 		~Drawable();
+
+		//allows child classes to handle the setup themselves
+		virtual void SetupBuffer() = 0;
+
 		virtual void Draw() = 0;
 
 		virtual Shader* GetShader() = 0;

@@ -26,6 +26,9 @@ namespace GraphicsEngine {
 
 		 void SetUniformMat4(const glm::mat4& x, const std::string& name);
 		 void SetUniformVec4(const glm::vec4& x, const std::string& name);
+
+		 void SetUniformVec2(const glm::vec2& x, const std::string& name);
+
 	private:
 		ShaderProgramSource ParseShader(const std::string& vertexFilePath, const std::string& fragFilePath);
 		int CompileShader(unsigned int type, const std::string& src);

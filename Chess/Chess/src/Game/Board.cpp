@@ -9,6 +9,7 @@
 
 Chess::Board::Board()
 {
+	SetupBuffer();
 	SetupData();
 
 	this->shader = new GraphicsEngine::Shader("src/GraphicsEngine/Shaders/Vertex/BoardVertex.txt",
@@ -21,7 +22,7 @@ Chess::Board::Board()
 	glCheck(glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(float), vertexData.data(), GL_STATIC_DRAW));
 
 	glCheck(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
-	glCheck(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(float), indices.data(), GL_STATIC_DRAW));
+	glCheck(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW));
 
 	glCheck(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0));
 	glCheck(glEnableVertexAttribArray(0));
@@ -33,6 +34,18 @@ Chess::Board::Board()
 	modelMatrix = glm::translate(modelMatrix, glm::vec3(0.f, 0.f, -1.0f));
 }
 
+
+void Chess::Board::SetupBuffer()
+{
+	//gen buffers
+	glCheck(glGenVertexArrays(1, &vao));
+	glCheck(glGenBuffers(1, &vbo));
+	glCheck(glGenBuffers(1, &ebo));
+
+	//ensure nothing else is bound
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
 
 void Chess::Board::Draw()
 {

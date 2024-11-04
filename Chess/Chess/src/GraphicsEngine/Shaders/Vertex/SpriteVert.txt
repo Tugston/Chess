@@ -1,0 +1,13 @@
+#version 410 core
+layout (location = 0) in vec2 aPos;
+
+uniform vec2 offsets[32];
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+void main()
+{
+	vec2 offset = offsets[gl_InstanceID];
+	gl_Position = projection * view * model * vec4(aPos + offset, 0.f, 1.f);
+}

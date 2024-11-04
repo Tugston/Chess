@@ -29,6 +29,11 @@ void GraphicsEngine::Shader::SetUniformVec4(const glm::vec4& x, const std::strin
 	glUniform4fv(glGetUniformLocation(program, name.c_str()), 1, glm::value_ptr(x));
 }
 
+void GraphicsEngine::Shader::SetUniformVec2(const glm::vec2& x, const std::string& name)
+{
+	glUniform2fv(glGetUniformLocation(program, name.c_str()), 1, glm::value_ptr(x));
+}
+
 GraphicsEngine::ShaderProgramSource GraphicsEngine::Shader::ParseShader(const std::string& vertexFilePath, const std::string& fragFilePath)
 {
 	std::string vertSrc;
