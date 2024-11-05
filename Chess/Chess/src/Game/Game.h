@@ -41,24 +41,8 @@ namespace Chess {
 		void Draw(Uint32 DeltaTime);
 		void Tick();
 
-		std::vector<float> vertexData{
-			 0.5f,  0.5f, 0.f,
-			 0.5f, -0.5f, 0.f,
-			-0.5f, -0.5f, 0.f,
-			-0.5f,  0.5f, 0.f
-		};
-
-		std::vector<unsigned int> indices{
-			0, 1, 3,
-			1, 2, 3
-		};
-
-		unsigned int vao;
-		unsigned int vbo;
-		unsigned int ebo;
-
-		glm::mat4 model = glm::mat4(1.f);
-
+	
+		void SetupPieces();
 
 	private:
 
@@ -78,5 +62,6 @@ namespace Chess {
 		bool quit;
 
 		Uint32 lastUpdateTime;
+
 	};
 }

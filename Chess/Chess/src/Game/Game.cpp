@@ -8,11 +8,9 @@ using namespace Chess;
 Game::Game() : quit(false){
 
 	//lightweight gl classes are created on constructor
-	window = new GraphicsEngine::Window();
+	window = new GraphicsEngine::Window;
 	camera = new GraphicsEngine::Camera;
 
-	model = glm::translate(model, glm::vec3(.5f, .5f, -1.0f));
-	model = glm::rotate(model, glm::radians(0.f), glm::vec3(0.f, 0.f, 1.f));
 }
 
 Game::~Game()
@@ -25,7 +23,7 @@ Game::~Game()
 	drawables.clear();
 
 	delete board;
-
+	delete spriteRenderer;
 	delete window;
 }
 
@@ -41,12 +39,7 @@ void Game::Start()
 
 	spriteRenderer = new GraphicsEngine::SpriteRenderer;
 
-	for (int i = 0; i < 32; i++) {
-		spriteRenderer->AddSpriteData(glm::vec2(1 + i, 1 + i));
-	}
-
-	spriteRenderer->SetupBuffer();
-	drawables.push_back(spriteRenderer);
+	
 
 	Tick();
 }
@@ -107,4 +100,38 @@ void Game::Tick()
 	}
 
 	
+}
+
+void Chess::Game::SetupPieces()
+{
+	float currentXOffset = 0;
+	float currentYOffset = 0;
+
+	//add white piece data
+	for (int i = 0; i < 16; i++) {
+		if (i == 8) {
+			currentYOffset += 1;
+			currentXOffset = 0;
+		}
+		spriteRenderer->AddSpriteData(glm::vec2(currentXOffset, currentYOffset));
+		currentXOffset += 1;
+	}
+
+	currentXOffset = 0;
+	currentYOffset = 6;
+
+	//add black piece data
+	for (int i = 0; i < 16; i++)
+	{
+		if (i == 8) {
+			currentYOffset += 1;
+			currentXOffset = 0;
+		}
+		spriteRenderer->AddSpriteData(glm::vec2(currentXOffset, currentYOffset));
+		currentXOffset += 1;
+	}
+
+
+	spriteRenderer->SetupBuffer();
+	drawables.push_back(spriteRenderer);
 }

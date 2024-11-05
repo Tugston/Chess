@@ -30,6 +30,8 @@ namespace GraphicsEngine {
 		std::vector<unsigned int> spriteIndices;
 
 		std::vector<glm::vec2> translations;
+
+		unsigned int instanceVBO;
 		
 	};
 
