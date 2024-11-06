@@ -8,6 +8,8 @@
 #include<fstream>
 #include<iostream>
 
+#include"Macros.h"
+
 GraphicsEngine::Shader::Shader(const std::string& vertexFilePath, const std::string& fragFilePath)
 {
 	ShaderProgramSource src = ParseShader(vertexFilePath, fragFilePath);
@@ -16,7 +18,7 @@ GraphicsEngine::Shader::Shader(const std::string& vertexFilePath, const std::str
 
 void GraphicsEngine::Shader::Use()
 {
-	glUseProgram(program);
+	glCheck(glUseProgram(program));
 }
 
 void GraphicsEngine::Shader::SetUniformMat4(const glm::mat4& x, const std::string& name)
@@ -85,15 +87,15 @@ int GraphicsEngine::Shader::CompileShader(unsigned int type, const std::string& 
 	std::cout << src << "\n\n";
 	const char* source = src.c_str();
 	unsigned int id = glCreateShader(type);
-	glShaderSource(id, 1, &source, NULL);
-	glCompileShader(type);
+	glCheck(glShaderSource(id, 1, &source, NULL));
+	glCheck(glCompileShader(id));
 
 	//error checking
 	int x;
 	char info[512];
-	glGetProgramiv(id, GL_LINK_STATUS, &x);
+	glCheck(glGetShaderiv(id, GL_COMPILE_STATUS, &x));
 	if (!x) {
-		glGetProgramInfoLog(id, 512, NULL, info);
+		glCheck(glGetProgramInfoLog(id, 512, NULL, info));
 		std::cout << "\n\nShader Compilation Error: " << info << "\n";
 	}
 
@@ -108,9 +110,9 @@ unsigned int GraphicsEngine::Shader::CreateShader(const std::string& vertShader,
 	unsigned int fragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragShader);
 
 	//link, validate, and merge the created shaders to the program
-	glAttachShader(tempProgram, vertexShader);
-	glAttachShader(tempProgram, fragmentShader);
-	glLinkProgram(tempProgram);
+	glCheck(glAttachShader(tempProgram, vertexShader));
+	glCheck(glAttachShader(tempProgram, fragmentShader));
+	glCheck(glLinkProgram(tempProgram));
 
 	//error checking
 	int x;
@@ -121,11 +123,11 @@ unsigned int GraphicsEngine::Shader::CreateShader(const std::string& vertShader,
 		std::cout << "\n\nShader Compilation Error: " << info << "\n";
 	}
 
-	glValidateProgram(tempProgram);
+	glCheck(glValidateProgram(tempProgram));
 	
 	//shader is created can clear memory
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	glCheck(glDeleteShader(vertexShader));
+	glCheck(glDeleteShader(fragmentShader));
 
 	return tempProgram;
 }

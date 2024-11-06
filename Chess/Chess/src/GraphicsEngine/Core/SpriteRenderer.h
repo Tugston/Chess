@@ -1,12 +1,10 @@
 #pragma once
 
-
 #include<vector>
-
-//#include<stb_image.h>
 
 
 #include "../Core/Drawable.h"
+
 
 namespace GraphicsEngine {
 
@@ -24,14 +22,25 @@ namespace GraphicsEngine {
 		glm::mat4 GetModelMatrix() { return this->modelMatrix; };
 
 		void AddSpriteData(glm::vec2 translation);
+
+		//sets the ID attribute 
+		void AddSpriteID(int id);
 	private:
 		//data for all the sprites in the game that need to be rendered
 		std::vector<float> vertexData;
 		std::vector<unsigned int> spriteIndices;
+		std::vector<float> textureIDs;
 
 		std::vector<glm::vec2> translations;
 
+		
+
 		unsigned int instanceVBO;
+		unsigned int texIDVBO; //vertex buffer for texture id's
+		
+
+		//temperary texture stuff
+		unsigned int texture;
 		
 	};
 

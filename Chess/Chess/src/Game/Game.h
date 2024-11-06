@@ -1,4 +1,6 @@
 #pragma once
+
+
 #define GLM_ENABLE_EXPERIMENTAL
 
 //libs
@@ -8,7 +10,6 @@
 #include<gtc/matrix_transform.hpp>
 #include<gtc/type_ptr.hpp>
 #include<gtx/string_cast.hpp>
-#include<stb_image.h>
 
 //std
 #include<iostream>
@@ -48,7 +49,6 @@ namespace Chess {
 
 		//CORE
 		GraphicsEngine::Window* window;
-		GraphicsEngine::Shader* shader;
 
 		//components
 		GraphicsEngine::Camera* camera;

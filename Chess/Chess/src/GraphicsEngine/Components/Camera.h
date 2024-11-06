@@ -22,7 +22,7 @@ namespace GraphicsEngine {
 		Camera(glm::vec3 position = glm::vec3(0.f, 0.f, 0.f), float windowSize = 800.f) :
 			front(glm::vec3(0.f, 0.f, -1.f)), position(position)
 		{
-			projection = glm::ortho(0.0f, 8.f, 0.f, 8.f, 0.001f, 2000.f);
+			projection = glm::ortho(0.0f, 8.f, 0.f, 8.f, 0.1f, 100.f);
 			//projection = glm::perspective(glm::radians(90.f), (float)windowSize / windowSize, 0.01f, 2000.f);
 		};
 

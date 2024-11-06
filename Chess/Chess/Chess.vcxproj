@@ -76,12 +76,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Dependencies\GLEW\include;$(SolutionDir)\Dependencies\SDL\include;$(SolutionDir)\Dependencies\STB</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Dependencies\GLEW\include;$(SolutionDir)\Dependencies\SDL\include;$(SolutionDir)\Dependencies\glm;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\GLEW\lib;$(SolutionDir)\Dependencies\SDL\lib;$(SolutionDir)\Dependencies\glm</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\GLEW\lib;$(SolutionDir)\Dependencies\SDL\lib;</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);SDL2.lib;SDL2main.lib;glew32s.lib;opengl32.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -93,14 +93,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Dependencies\GLEW\include;$(SolutionDir)\Dependencies\SDL\include;$(SolutionDir)\Dependencies\STB</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Dependencies\GLEW\include;$(SolutionDir)\Dependencies\SDL\include;$(SolutionDir)\Dependencies\glm;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\GLEW\lib;$(SolutionDir)\Dependencies\SDL\lib;$(SolutionDir)\Dependencies\glm</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\GLEW\lib;$(SolutionDir)\Dependencies\SDL\lib;</AdditionalLibraryDirectories>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);SDL2.lib;SDL2main.lib;glew32s.lib;opengl32.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -133,21 +133,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Game\Board.cpp" />
     <ClCompile Include="src\Game\Game.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Components\Sprite.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Core\Drawable.cpp" />
     <ClCompile Include="src\GraphicsEngine\Core\Shader.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Core\SpriteRenderer.cpp" />
     <ClCompile Include="src\GraphicsEngine\Core\Window.cpp" />
     <ClCompile Include="src\Game\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Game\Board.h" />
     <ClInclude Include="src\Game\Game.h" />
     <ClInclude Include="src\Game\Input.h" />
+    <ClInclude Include="src\GraphicsEngine\Components\Camera.h" />
+    <ClInclude Include="src\GraphicsEngine\Components\Sprite.h" />
+    <ClInclude Include="src\GraphicsEngine\Core\Drawable.h" />
     <ClInclude Include="src\GraphicsEngine\Core\Macros.h" />
     <ClInclude Include="src\GraphicsEngine\Core\Shader.h" />
+    <ClInclude Include="src\GraphicsEngine\Core\SpriteRenderer.h" />
+    <ClInclude Include="src\GraphicsEngine\Core\Dependencies\stb_image.h" />
     <ClInclude Include="src\GraphicsEngine\Core\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\GraphicsEngine\Shaders\Frag\BoardFrag.txt" />
+    <Text Include="src\GraphicsEngine\Shaders\Frag\SpriteFrag.txt" />
     <Text Include="src\GraphicsEngine\Shaders\Vertex\BoardVertex.txt" />
+    <Text Include="src\GraphicsEngine\Shaders\Vertex\SpriteVert.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="src\Game\Textures\8BitPieces.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

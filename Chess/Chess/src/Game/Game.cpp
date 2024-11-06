@@ -5,11 +5,16 @@
 
 using namespace Chess;
 
-Game::Game() : quit(false){
+Game::Game() : quit(false), lastUpdateTime(0){
 
 	//lightweight gl classes are created on constructor
 	window = new GraphicsEngine::Window;
 	camera = new GraphicsEngine::Camera;
+
+
+	board = nullptr;
+	spriteRenderer = nullptr;
+
 
 }
 
@@ -33,12 +38,12 @@ void Game::Start()
 	//heavier using gl classes created on start
 	
 	//board has gameplay material, so need a direct pointer as well as pushing it into the drawables
-	//in order to be drawn
+	//in order to be drawn easier
 	board = new Board;
 	drawables.push_back(board);
 
 	spriteRenderer = new GraphicsEngine::SpriteRenderer;
-
+	SetupPieces();
 	
 
 	Tick();
@@ -114,6 +119,7 @@ void Chess::Game::SetupPieces()
 			currentXOffset = 0;
 		}
 		spriteRenderer->AddSpriteData(glm::vec2(currentXOffset, currentYOffset));
+		spriteRenderer->AddSpriteID(5);
 		currentXOffset += 1;
 	}
 
@@ -128,6 +134,7 @@ void Chess::Game::SetupPieces()
 			currentXOffset = 0;
 		}
 		spriteRenderer->AddSpriteData(glm::vec2(currentXOffset, currentYOffset));
+		spriteRenderer->AddSpriteID(15);
 		currentXOffset += 1;
 	}
 

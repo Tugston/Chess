@@ -1,7 +1,23 @@
 #version 410 core
+in vec2 TexCoord;
+flat in float texID; // determines which texture to use, from the vertex shader
+
 out vec4 FragColor;
+
+uniform sampler2D myTexture;
+
 
 void main()
 {
-	FragColor = vec4(1.f);
+	int myTextureGridSize = 4;
+	float subTextureSize = 1.f / myTextureGridSize;
+
+	//get the row and column index position
+	int col = int(mod(texID, myTextureGridSize));
+	int row = int(texID / myTextureGridSize);
+
+	vec2 offset = vec2(col, row) * subTextureSize;
+	vec2 finalTexCoords = offset + TexCoord * subTextureSize;
+
+	FragColor = texture(myTexture, finalTexCoords);
 }

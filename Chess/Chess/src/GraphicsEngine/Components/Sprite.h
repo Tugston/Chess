@@ -1,5 +1,7 @@
 #pragma once
 
+#include<vector>
+
 #include "../Core/Drawable.h"
 
 namespace GraphicsEngine {
@@ -9,8 +11,13 @@ namespace GraphicsEngine {
 		
 
 	public:
-		Sprite();
-		~Sprite();
+		//Sprite(unsigned int textureID);
+		//~Sprite();
+
+	private:
+		//std::vector<float> vertexData;
+
+		//unsigned int textureID;
 	};
 
 }
