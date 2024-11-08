@@ -135,6 +135,13 @@
   <ItemGroup>
     <ClCompile Include="src\Game\Board.cpp" />
     <ClCompile Include="src\Game\Game.cpp" />
+    <ClCompile Include="src\Game\Pieces\BaseChessPiece.cpp" />
+    <ClCompile Include="src\Game\Pieces\Bishop.cpp" />
+    <ClCompile Include="src\Game\Pieces\King.cpp" />
+    <ClCompile Include="src\Game\Pieces\Knight.cpp" />
+    <ClCompile Include="src\Game\Pieces\Pawn.cpp" />
+    <ClCompile Include="src\Game\Pieces\Queen.cpp" />
+    <ClCompile Include="src\Game\Pieces\Rook.cpp" />
     <ClCompile Include="src\GraphicsEngine\Components\Sprite.cpp" />
     <ClCompile Include="src\GraphicsEngine\Core\Drawable.cpp" />
     <ClCompile Include="src\GraphicsEngine\Core\Shader.cpp" />
@@ -146,6 +153,14 @@
     <ClInclude Include="src\Game\Board.h" />
     <ClInclude Include="src\Game\Game.h" />
     <ClInclude Include="src\Game\Input.h" />
+    <ClInclude Include="src\Game\Pieces\BaseChessPiece.h" />
+    <ClInclude Include="src\Game\Pieces\Bishop.h" />
+    <ClInclude Include="src\Game\Pieces\King.h" />
+    <ClInclude Include="src\Game\Pieces\Knight.h" />
+    <ClInclude Include="src\Game\Pieces\Pawn.h" />
+    <ClInclude Include="src\Game\Pieces\Queen.h" />
+    <ClInclude Include="src\Game\Pieces\Rook.h" />
+    <ClInclude Include="src\GraphicsEngine\Components\BasePiece.h" />
     <ClInclude Include="src\GraphicsEngine\Components\Camera.h" />
     <ClInclude Include="src\GraphicsEngine\Components\Sprite.h" />
     <ClInclude Include="src\GraphicsEngine\Core\Drawable.h" />

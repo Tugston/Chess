@@ -11,13 +11,8 @@ namespace GraphicsEngine {
 		
 
 	public:
-		//Sprite(unsigned int textureID);
-		//~Sprite();
 
 	private:
-		//std::vector<float> vertexData;
-
-		//unsigned int textureID;
 	};
 
 }

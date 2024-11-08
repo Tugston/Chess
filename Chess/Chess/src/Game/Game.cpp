@@ -2,6 +2,14 @@
 
 #include "../GraphicsEngine/Core/Macros.h"
 
+//pieces
+#include "Pieces/King.h"
+#include "Pieces/Bishop.h"
+#include "Pieces/Knight.h"
+#include "Pieces/Pawn.h"
+#include "Pieces/Queen.h"
+#include "Pieces/Rook.h"
+
 
 using namespace Chess;
 
@@ -109,33 +117,54 @@ void Game::Tick()
 
 void Chess::Game::SetupPieces()
 {
+	//location offsets
 	float currentXOffset = 0;
 	float currentYOffset = 0;
 
-	//add white piece data
-	for (int i = 0; i < 16; i++) {
-		if (i == 8) {
-			currentYOffset += 1;
-			currentXOffset = 0;
-		}
-		spriteRenderer->AddSpriteData(glm::vec2(currentXOffset, currentYOffset));
-		spriteRenderer->AddSpriteID(5);
-		currentXOffset += 1;
+
+
+
+	//populate white pieces
+	//could loop this, but whats the point of using the enum here if I just pass uints anyways
+	WhitePieces.push_back(new Rook(WHITE, glm::vec2(0, 0)));
+	WhitePieces.push_back(new Knight(WHITE, glm::vec2(1, 0)));
+	WhitePieces.push_back(new Bishop(WHITE, glm::vec2(2, 0)));
+	WhitePieces.push_back(new Queen(WHITE, glm::vec2(3, 0)));
+	WhitePieces.push_back(new King(WHITE, glm::vec2(4, 0)));
+	WhitePieces.push_back(new Bishop(WHITE, glm::vec2(5, 0)));
+	WhitePieces.push_back(new Knight(WHITE, glm::vec2(6, 0)));
+	WhitePieces.push_back(new Rook(WHITE, glm::vec2(7, 0)));
+
+	//we can loop the pawns cause I am tired of copy pasting
+	for (int i = 7; i >= 0; i--)
+	{
+		WhitePieces.push_back(new Pawn(WHITE, glm::vec2(i, 1)));
 	}
 
-	currentXOffset = 0;
-	currentYOffset = 6;
+	BlackPieces.push_back(new Rook(BLACK, glm::vec2(0, 7)));
+	BlackPieces.push_back(new Knight(BLACK, glm::vec2(1, 7)));
+	BlackPieces.push_back(new Bishop(BLACK, glm::vec2(2, 7)));
+	BlackPieces.push_back(new Queen(BLACK, glm::vec2(3, 7)));
+	BlackPieces.push_back(new King(BLACK, glm::vec2(4, 7)));
+	BlackPieces.push_back(new Bishop(BLACK, glm::vec2(5, 7)));
+	BlackPieces.push_back(new Knight(BLACK, glm::vec2(6, 7)));
+	BlackPieces.push_back(new Rook(BLACK, glm::vec2(7, 7))); 
 
-	//add black piece data
-	for (int i = 0; i < 16; i++)
+	for (int i = 7; i >= 0; i--)
 	{
-		if (i == 8) {
-			currentYOffset += 1;
-			currentXOffset = 0;
-		}
-		spriteRenderer->AddSpriteData(glm::vec2(currentXOffset, currentYOffset));
-		spriteRenderer->AddSpriteID(15);
-		currentXOffset += 1;
+		BlackPieces.push_back(new Pawn(BLACK, glm::vec2(i, 6)));
+	} 
+
+	for (int i = 0; i < WhitePieces.size(); i++)
+	{
+		spriteRenderer->AddSpriteData(WhitePieces.at(i)->GetOffset());
+		spriteRenderer->AddSpriteID(WhitePieces.at(i)->GetTextureID());
+	}
+
+	for (int i = 0; i < BlackPieces.size(); i++)
+	{
+		spriteRenderer->AddSpriteData(BlackPieces.at(i)->GetOffset());
+		spriteRenderer->AddSpriteID(BlackPieces.at(i)->GetTextureID());
 	}
 
 

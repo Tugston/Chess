@@ -14,9 +14,11 @@
 //std
 #include<iostream>
 #include<vector>
+#include<map>
 
 //_________GAME INCLUDES________
 #include "../Game/Board.h"
+
 
 //_________CORE INCLUDES________
 #include "../GraphicsEngine/Core/Window.h"
@@ -30,6 +32,9 @@
 
 //game class that handles everything
 namespace Chess {
+
+	class BasePiece;
+
 	class Game {
 	public:
 
@@ -57,6 +62,10 @@ namespace Chess {
 		GraphicsEngine::SpriteRenderer* spriteRenderer;
 
 		std::vector<GraphicsEngine::Drawable*> drawables;
+
+
+		std::vector<Chess::BasePiece*> WhitePieces;
+		std::vector<Chess::BasePiece*> BlackPieces;
 
 
 		bool quit;
