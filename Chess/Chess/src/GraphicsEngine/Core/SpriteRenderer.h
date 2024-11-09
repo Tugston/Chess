@@ -21,10 +21,16 @@ namespace GraphicsEngine {
 		Shader* GetShader() { return this->shader; };
 		glm::mat4 GetModelMatrix() { return this->modelMatrix; };
 
-		void AddSpriteData(glm::vec2 translation);
+		void AddSpriteData(const glm::vec2& offset);
+		//moves specified instance
+		void MoveSpriteInstance(glm::vec2 offset, const unsigned int& instanceNum);
+		void SendSpriteInstancesToGPU();
 
 		//sets the ID attribute 
 		void AddSpriteID(int id);
+		void SendTextureIdsToGPU();
+
+		
 	private:
 		//data for all the sprites in the game that need to be rendered
 		std::vector<float> vertexData;

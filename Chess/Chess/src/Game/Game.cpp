@@ -28,12 +28,22 @@ Game::Game() : quit(false), lastUpdateTime(0){
 
 Game::~Game()
 {
-	for (int i = 0; i < drawables.size(); i++)
+	for (GraphicsEngine::Drawable* i : drawables)
 	{
-		delete drawables[i];
+		delete i;
 	}
 
 	drawables.clear();
+
+	for (BasePiece* i : WhitePieces)
+	{
+		delete i;
+	}
+
+	for (BasePiece* i : BlackPieces)
+	{
+		delete i;
+	}
 
 	delete board;
 	delete spriteRenderer;
@@ -86,6 +96,9 @@ void Game::Draw(Uint32 DeltaTime)
 
 void Game::Tick()
 {
+	//mouse x and y position
+	int x, y = 0;
+
 	while (!quit)
 	{
 		Uint32 currentTime = SDL_GetTicks();
@@ -100,9 +113,80 @@ void Game::Tick()
 			case SDL_QUIT:
 				quit = true;
 				break;
+			case SDL_MOUSEBUTTONDOWN:
+				if (keyEvent.button.button == SDL_BUTTON_LEFT) {
+
+					SDL_GetMouseState(&x, &y);
+					//y = SCREENSIZE - y;
+					//x = SCREENSIZE - x;
+
+					if (currentSelectedPiece)
+					{
+						glm::vec2 inverseOffset = glm::vec2(x, y);
+						inverseOffset = ScreenPosToOffset(inverseOffset);
+						inverseOffset.x *= -1;
+						inverseOffset.x = -inverseOffset.x - 5; 
+						
+						
+						currentSelectedPiece->SetOffset(ScreenPosToOffset(glm::vec2(x * -1, y)));
+						currentSelectedPiece->SetStartOffset(ScreenPosToOffset(glm::vec2(x * -1, y)));
+
+						//janky stuff I have to do to get it to work
+						//the sprite renderer needs the x = screensize - x undone and it needs to be inversed
+						//may fix later, if there are some problems, but probably not cause it works as of now! :)
+						//x = SCREENSIZE + x * -1;
+
+						spriteRenderer->MoveSpriteInstance(currentSelectedPiece->GetOffset(), currentSelectedPiece->GetArrayIndex());
+					
+
+						PrintVec2Data(glm::vec2(x, y), "Mouse Position");
+						PrintVec2Data(ScreenPosToOffset(glm::vec2(inverseOffset.x, inverseOffset.y)), "Drop Offset");
+						PrintVec2Data(ScreenPosToOffset(glm::vec2(x, y)), "Mouse Offset - add 8 to x for board pos");
+						PrintVec2Data(currentSelectedPiece->GetStartOffset(), "Piece Starting Offset - Dropped");
+						
+
+						currentSelectedPiece = nullptr;
+					}
+					else {
+
+						for (int i = 0; i < WhitePieces.size(); i++)
+						{
+							if (WhitePieces[i]->HitDetection(ScreenPosToOffset(glm::vec2(x * -1, y)))) {
+								currentSelectedPiece = WhitePieces[i];
+								std::cout << currentSelectedPiece->GetTypeName() << "\n";
+								PrintVec2Data(WhitePieces[i]->GetOffset(), "Piece Current Offset");
+								PrintVec2Data(WhitePieces[i]->GetStartOffset(), "Piece Starting Offset");
+								PrintVec2Data(WhitePieces[i]->GetBoundary(), "Piece Boundary");
+								PrintVec2Data(glm::vec2(x, y), "Mouse Position");
+								
+							};
+						}
+
+						PrintVec2Data(ScreenPosToOffset(glm::vec2(x, y)), "Mouse Offset - add 8 to x for board pos");
+					}
+				}
+				else {
+					if (currentSelectedPiece) {
+						currentSelectedPiece->SetOffset(currentSelectedPiece->GetStartOffset());
+
+
+						spriteRenderer->MoveSpriteInstance(currentSelectedPiece->GetStartOffset(),
+							currentSelectedPiece->GetArrayIndex());
+						currentSelectedPiece = nullptr;
+
+					}
+				}
+				break;
 			default:
 				break;
 			}
+		}
+
+		if (currentSelectedPiece) {
+			SDL_GetMouseState(&x, &y);
+			glm::vec2 movePosition = ScreenPosToOffset(glm::vec2(x, y));
+			movePosition.x += 7;
+			spriteRenderer->MoveSpriteInstance(movePosition, currentSelectedPiece->GetArrayIndex());
 		}
 
 
@@ -121,38 +205,38 @@ void Chess::Game::SetupPieces()
 	float currentXOffset = 0;
 	float currentYOffset = 0;
 
-
+	
 
 
 	//populate white pieces
 	//could loop this, but whats the point of using the enum here if I just pass uints anyways
-	WhitePieces.push_back(new Rook(WHITE, glm::vec2(0, 0)));
-	WhitePieces.push_back(new Knight(WHITE, glm::vec2(1, 0)));
-	WhitePieces.push_back(new Bishop(WHITE, glm::vec2(2, 0)));
-	WhitePieces.push_back(new Queen(WHITE, glm::vec2(3, 0)));
-	WhitePieces.push_back(new King(WHITE, glm::vec2(4, 0)));
-	WhitePieces.push_back(new Bishop(WHITE, glm::vec2(5, 0)));
-	WhitePieces.push_back(new Knight(WHITE, glm::vec2(6, 0)));
-	WhitePieces.push_back(new Rook(WHITE, glm::vec2(7, 0)));
+	WhitePieces.push_back(new Rook(WHITE, ScreenPosToOffset(glm::vec2(800, 700)), 0));
+	WhitePieces.push_back(new Knight(WHITE, ScreenPosToOffset(glm::vec2(900, 700)), 1));
+	WhitePieces.push_back(new Bishop(WHITE, ScreenPosToOffset(glm::vec2(1000, 700)), 2));
+	WhitePieces.push_back(new Queen(WHITE, ScreenPosToOffset(glm::vec2(1100, 700)), 3));
+	WhitePieces.push_back(new King(WHITE, ScreenPosToOffset(glm::vec2(1200, 700)), 4));
+	WhitePieces.push_back(new Bishop(WHITE, ScreenPosToOffset(glm::vec2(1300, 700)), 5));
+	WhitePieces.push_back(new Knight(WHITE, ScreenPosToOffset(glm::vec2(1400, 700)), 6));
+	WhitePieces.push_back(new Rook(WHITE, ScreenPosToOffset(glm::vec2(1500, 700)), 7));
 
 	//we can loop the pawns cause I am tired of copy pasting
-	for (int i = 7; i >= 0; i--)
+	for (int i = 1; i < 9; i++)
 	{
-		WhitePieces.push_back(new Pawn(WHITE, glm::vec2(i, 1)));
+		WhitePieces.push_back(new Pawn(WHITE, ScreenPosToOffset(glm::vec2(i * 100 + 700, 600)), i + 7));
 	}
 
-	BlackPieces.push_back(new Rook(BLACK, glm::vec2(0, 7)));
-	BlackPieces.push_back(new Knight(BLACK, glm::vec2(1, 7)));
-	BlackPieces.push_back(new Bishop(BLACK, glm::vec2(2, 7)));
-	BlackPieces.push_back(new Queen(BLACK, glm::vec2(3, 7)));
-	BlackPieces.push_back(new King(BLACK, glm::vec2(4, 7)));
-	BlackPieces.push_back(new Bishop(BLACK, glm::vec2(5, 7)));
-	BlackPieces.push_back(new Knight(BLACK, glm::vec2(6, 7)));
-	BlackPieces.push_back(new Rook(BLACK, glm::vec2(7, 7))); 
+	BlackPieces.push_back(new Rook(BLACK, ScreenPosToOffset(glm::vec2(800, 0)), 15));
+	BlackPieces.push_back(new Knight(BLACK, ScreenPosToOffset(glm::vec2(900, 0)), 16));
+	BlackPieces.push_back(new Bishop(BLACK, ScreenPosToOffset(glm::vec2(1000, 0)), 17));
+	BlackPieces.push_back(new Queen(BLACK, ScreenPosToOffset(glm::vec2(1100, 0)), 18));
+	BlackPieces.push_back(new King(BLACK, ScreenPosToOffset(glm::vec2(1200, 0)), 19));
+	BlackPieces.push_back(new Bishop(BLACK, ScreenPosToOffset(glm::vec2(1300, 0)), 20));
+	BlackPieces.push_back(new Knight(BLACK, ScreenPosToOffset(glm::vec2(1400, 0)), 21));
+	BlackPieces.push_back(new Rook(BLACK, ScreenPosToOffset(glm::vec2(1500, 0)), 22));
 
-	for (int i = 7; i >= 0; i--)
+	for (int i = 1; i < 9; i++)
 	{
-		BlackPieces.push_back(new Pawn(BLACK, glm::vec2(i, 6)));
+		BlackPieces.push_back(new Pawn(BLACK, ScreenPosToOffset(glm::vec2(i * 100 + 700, 100)), i + 22));
 	} 
 
 	for (int i = 0; i < WhitePieces.size(); i++)
@@ -167,7 +251,60 @@ void Chess::Game::SetupPieces()
 		spriteRenderer->AddSpriteID(BlackPieces.at(i)->GetTextureID());
 	}
 
+	spriteRenderer->SendSpriteInstancesToGPU();
+	spriteRenderer->SendTextureIdsToGPU();
 
 	spriteRenderer->SetupBuffer();
 	drawables.push_back(spriteRenderer);
+}
+
+glm::vec2 Chess::Game::ScreenPosToOffset(const glm::vec2& screenCoords)
+{
+	
+	int cellSize = SCREENSIZE / 8;
+
+	
+
+	int x = (SCREENSIZE - screenCoords.x) / cellSize;
+	int y = screenCoords.y / cellSize;
+
+	//x = (8 - 1) - x;
+
+	y *= -1;
+	x *= -1;
+	return glm::vec2(x, y);
+	
+}
+
+glm::vec2 Chess::Game::OffsetToScreenPos(glm::vec2 offset)
+{
+	int cellSize = SCREENSIZE / 8;
+
+	offset.x *= -1;
+	offset.y *= -1;
+
+	int x = SCREENSIZE - (offset.x - 1) * cellSize;
+	int y = offset.y * cellSize;
+
+	return glm::vec2(x, y);
+}
+
+void Chess::Game::PrintVec2Data(glm::vec2 x, std::string name)
+{
+	for (int i = 0; i < name.length(); i++)
+	{
+		std::cout << "-";
+	}
+
+	std::cout << "\n" << name << ": \n";
+
+	std::cout << "X: " << x.x << "\n";
+	std::cout << "Y: " << x.y << "\n";
+
+	for (int i = 0; i < name.length(); i++)
+	{
+		std::cout << "-";
+	}
+	
+	std::cout << "\n\n";
 }

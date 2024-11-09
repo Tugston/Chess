@@ -19,13 +19,13 @@ GraphicsEngine::SpriteRenderer::SpriteRenderer()
 
 	vertexData = {
 		 0.f, 0.f, 0.f,
-		 0.f, 0.f, //0,0
+		 0.f, 0.f, 
 		 1.f, 0.f, 0.f,
-		 1.f, 0, //1,0
+		 1.f, 0, 
 		 1.f, 1.f, 0.f,
-		 1.f, 1.f, //1,1
+		 1.f, 1.f,
 		 0.f, 1.f, 0.f,
-		 .0f, 1.f //0,1
+		 .0f, 1.f
 	};
 
 	spriteIndices = {
@@ -33,7 +33,7 @@ GraphicsEngine::SpriteRenderer::SpriteRenderer()
 		1, 2, 3
 	};
 
-	modelMatrix = glm::translate(modelMatrix, glm::vec3(0.f, 0.f, -1.f));
+	modelMatrix = glm::translate(modelMatrix, glm::vec3(0.f, 7.f, -1.f));
 
 
 	//TEMPORARY STUFF BECAUSE I WILL ADD THIS TO THE SPRITES THEMSELVES
@@ -130,21 +130,44 @@ void GraphicsEngine::SpriteRenderer::Draw()
 	glCheck(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 }
 
-void GraphicsEngine::SpriteRenderer::AddSpriteData(glm::vec2 translation)
+void GraphicsEngine::SpriteRenderer::AddSpriteData(const glm::vec2& offset)
 {
-	translations.push_back(translation);
+	translations.push_back(offset);
+}
 
+void GraphicsEngine::SpriteRenderer::SendSpriteInstancesToGPU()
+{
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
 	glBufferData(GL_ARRAY_BUFFER, translations.size() * sizeof(glm::vec2), translations.data(), GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void GraphicsEngine::SpriteRenderer::MoveSpriteInstance(glm::vec2 offset, const unsigned int& instanceNum)
+{
+	if (instanceNum > translations.size()) {
+		std::cout << "Error: Piece Out Of Range, Could Not Move It.";
+		return;
+	}
+
+	//do the lazy workaround here as well, like in the base chess piece
+	//offset.x = -offset.x - 7;
+
+	translations.at(instanceNum) = offset;
+
+	SendSpriteInstancesToGPU();
+}
+
 void GraphicsEngine::SpriteRenderer::AddSpriteID(int id)
 {
 	textureIDs.push_back(id);
+}
 
+void GraphicsEngine::SpriteRenderer::SendTextureIdsToGPU()
+{
 	glBindBuffer(GL_ARRAY_BUFFER, texIDVBO);
 	glBufferData(GL_ARRAY_BUFFER, textureIDs.size() * sizeof(float), textureIDs.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
+
 

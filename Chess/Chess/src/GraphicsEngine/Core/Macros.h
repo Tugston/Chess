@@ -22,3 +22,6 @@ static bool GLCheckErrorStatus(int line, std::string file) {
 #define glCheck(x) GLClearAllErrors(); x; GLCheckErrorStatus(__LINE__, __FILE__);
 
 //^^^^^^^^^^^^^^^^^^ Error Handling Routine ^^^^^^^^^^^^^^^^^^^^^^
+
+
+#define SCREENSIZE 800

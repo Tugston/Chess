@@ -9,7 +9,7 @@ namespace Chess {
 
 	public:
 
-		Bishop(PieceColor color, glm::vec2 offset);
+		Bishop(PieceColor color, glm::vec2 screenPosition, const unsigned int& arrayIndex);
 		~Bishop();
 
 

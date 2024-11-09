@@ -50,6 +50,11 @@ namespace Chess {
 	
 		void SetupPieces();
 
+		glm::vec2 ScreenPosToOffset(const glm::vec2& screenCoords);
+		glm::vec2 OffsetToScreenPos(glm::vec2 offset);
+
+		void PrintVec2Data(glm::vec2 x, std::string name);
+
 	private:
 
 		//CORE
@@ -66,6 +71,7 @@ namespace Chess {
 
 		std::vector<Chess::BasePiece*> WhitePieces;
 		std::vector<Chess::BasePiece*> BlackPieces;
+		Chess::BasePiece* currentSelectedPiece;
 
 
 		bool quit;

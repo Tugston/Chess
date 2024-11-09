@@ -2,7 +2,8 @@
 
 #include<iostream>
 
-Chess::Bishop::Bishop(PieceColor color, glm::vec2 offset) : BasePiece(BISHOP, color, offset)
+Chess::Bishop::Bishop(PieceColor color, glm::vec2 screenPosition, const unsigned int& arrayIndex)
+	: BasePiece(BISHOP, color, screenPosition, arrayIndex)
 {
 	if (color == WHITE) {
 		textureID = 5;

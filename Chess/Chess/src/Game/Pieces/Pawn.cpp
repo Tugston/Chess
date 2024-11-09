@@ -1,6 +1,7 @@
 #include "Pawn.h"
 
-Chess::Pawn::Pawn(PieceColor color, glm::vec2 offset) : BasePiece(PAWN, color, offset)
+Chess::Pawn::Pawn(PieceColor color, glm::vec2 screenPosition, const unsigned int& arrayIndex) 
+	: BasePiece(PAWN, color, screenPosition, arrayIndex)
 {
 	if (color == WHITE) {
 		textureID = 10;

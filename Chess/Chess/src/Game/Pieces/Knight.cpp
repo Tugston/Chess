@@ -1,6 +1,7 @@
 #include "Knight.h"
 
-Chess::Knight::Knight(PieceColor color, glm::vec2 offset) : BasePiece(KNIGHT, color, offset)
+Chess::Knight::Knight(PieceColor color, glm::vec2 screenPosition, const unsigned int& arrayIndex)
+	: BasePiece(KNIGHT, color, screenPosition, arrayIndex)
 {
 	if (color == WHITE) {
 		textureID = 4;

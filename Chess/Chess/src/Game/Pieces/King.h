@@ -9,7 +9,7 @@ namespace Chess {
 
 
 	public:
-		King(PieceColor color, glm::vec2 offset);
+		King(PieceColor color, glm::vec2 screenPosition, const unsigned int& arrayIndex);
 		~King();
 
 		void Selected();

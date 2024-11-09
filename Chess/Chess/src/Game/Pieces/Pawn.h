@@ -8,7 +8,7 @@ namespace Chess {
 	public:
 
 	public:
-		Pawn(PieceColor color, glm::vec2 offset);
+		Pawn(PieceColor color, glm::vec2 screenPosition, const unsigned int& arrayIndex);
 		~Pawn();
 
 		void Selected();

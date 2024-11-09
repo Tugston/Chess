@@ -1,6 +1,7 @@
 #include "Rook.h"
 
-Chess::Rook::Rook(PieceColor color, glm::vec2 offset) : BasePiece(ROOK, color, offset)
+Chess::Rook::Rook(PieceColor color, glm::vec2 screenPosition, const unsigned int& arrayIndex)
+	: BasePiece(ROOK, color, screenPosition, arrayIndex)
 {
 	if (color == WHITE) {
 		textureID = 11;
