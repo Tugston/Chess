@@ -14,6 +14,8 @@ namespace Chess {
 
 		void Selected();
 		void DeSelected();
+
+		std::vector<glm::vec2> GetAvailableMoves(glm::vec2 currentPosition);
 	private:
 
 	};

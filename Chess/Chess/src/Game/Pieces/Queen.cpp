@@ -22,3 +22,8 @@ void Chess::Queen::Selected()
 void Chess::Queen::DeSelected()
 {
 }
+
+std::vector<glm::vec2> Chess::Queen::GetAvailableMoves(glm::vec2 currentPosition)
+{
+	return std::vector<glm::vec2>();
+}

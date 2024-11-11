@@ -13,7 +13,7 @@
 
 using namespace Chess;
 
-Game::Game() : quit(false), lastUpdateTime(0){
+Game::Game() : quit(false), lastUpdateTime(0), currentTurn(Turn::White){
 
 	//lightweight gl classes are created on constructor
 	window = new GraphicsEngine::Window;
@@ -23,7 +23,7 @@ Game::Game() : quit(false), lastUpdateTime(0){
 	board = nullptr;
 	spriteRenderer = nullptr;
 
-
+	currentSelectedPiece = nullptr;
 }
 
 Game::~Game()
@@ -104,6 +104,11 @@ void Game::Tick()
 		Uint32 currentTime = SDL_GetTicks();
 		Uint32 DeltaTime = currentTime - lastUpdateTime;
 
+		std::vector<glm::vec2> testPos;
+		testPos.push_back(glm::vec2(1, 1));
+		//testPos.push_back(glm::vec2(0, 0));
+		//testPos.push_back(glm::vec2(1, 0));
+		//testPos.push_back(glm::vec2(0, 1));
 
 		SDL_Event keyEvent;
 		while (SDL_PollEvent(&keyEvent))
@@ -122,44 +127,61 @@ void Game::Tick()
 
 					if (currentSelectedPiece)
 					{
-						glm::vec2 inverseOffset = glm::vec2(x, y);
-						inverseOffset = ScreenPosToOffset(inverseOffset);
-						inverseOffset.x *= -1;
-						inverseOffset.x = -inverseOffset.x - 5; 
-						
-						
-						currentSelectedPiece->SetOffset(ScreenPosToOffset(glm::vec2(x * -1, y)));
-						currentSelectedPiece->SetStartOffset(ScreenPosToOffset(glm::vec2(x * -1, y)));
+						bool canMove = currentSelectedPiece->GetMoves(ScreenPosToOffset(glm::vec2(x * -1, y)), moves, (currentTurn == White) ? true : false);
+						for (int i = 0; i < moves.size(); i++)
+						{
+							PrintVec2Data(moves.at(i), "Move " + std::to_string(i));
+						}
 
-						//janky stuff I have to do to get it to work
-						//the sprite renderer needs the x = screensize - x undone and it needs to be inversed
-						//may fix later, if there are some problems, but probably not cause it works as of now! :)
-						//x = SCREENSIZE + x * -1;
+						if (canMove) {
+							currentSelectedPiece->SetOffset(ScreenPosToOffset(glm::vec2(x * -1, y)), (currentTurn == White) ? true : false);
+							currentSelectedPiece->SetStartOffset(ScreenPosToOffset(glm::vec2(x * -1, y)), (currentTurn == WHITE) ? true : false);
 
-						spriteRenderer->MoveSpriteInstance(currentSelectedPiece->GetOffset(), currentSelectedPiece->GetArrayIndex());
-					
+							moves.clear();
+							board->DisplayMoves(moves);
 
-						PrintVec2Data(glm::vec2(x, y), "Mouse Position");
-						PrintVec2Data(ScreenPosToOffset(glm::vec2(inverseOffset.x, inverseOffset.y)), "Drop Offset");
-						PrintVec2Data(ScreenPosToOffset(glm::vec2(x, y)), "Mouse Offset - add 8 to x for board pos");
-						PrintVec2Data(currentSelectedPiece->GetStartOffset(), "Piece Starting Offset - Dropped");
-						
+							spriteRenderer->MoveSpriteInstance(currentSelectedPiece->GetOffset(), currentSelectedPiece->GetArrayIndex());
 
-						currentSelectedPiece = nullptr;
+
+							PrintVec2Data(glm::vec2(x, y), "Mouse Position");
+							PrintVec2Data(ScreenPosToOffset(glm::vec2(x, y)), "Mouse Offset - add 8 to x for board pos");
+							PrintVec2Data(currentSelectedPiece->GetStartOffset(), "Piece Starting Offset - Dropped");
+
+
+							currentSelectedPiece = nullptr;
+							SwapTurn();
+						}
 					}
 					else {
 
-						for (int i = 0; i < WhitePieces.size(); i++)
-						{
-							if (WhitePieces[i]->HitDetection(ScreenPosToOffset(glm::vec2(x * -1, y)))) {
-								currentSelectedPiece = WhitePieces[i];
-								std::cout << currentSelectedPiece->GetTypeName() << "\n";
-								PrintVec2Data(WhitePieces[i]->GetOffset(), "Piece Current Offset");
-								PrintVec2Data(WhitePieces[i]->GetStartOffset(), "Piece Starting Offset");
-								PrintVec2Data(WhitePieces[i]->GetBoundary(), "Piece Boundary");
-								PrintVec2Data(glm::vec2(x, y), "Mouse Position");
-								
-							};
+						//left click to pickup piece according to turn
+						if (currentTurn == White) {
+
+							for (int i = 0; i < WhitePieces.size(); i++)
+							{
+								if (WhitePieces[i]->HitDetection(ScreenPosToOffset(glm::vec2(x * -1, y)), true)) {
+									currentSelectedPiece = WhitePieces[i];
+
+									currentSelectedPiece->GetMoves(ScreenPosToOffset(glm::vec2(x * -1, y)), moves, (currentTurn == White) ? true : false);
+									std::cout << currentSelectedPiece->GetTypeName() << "\n";
+									PrintVec2Data(WhitePieces[i]->GetOffset(), "Piece Current Offset");
+									PrintVec2Data(WhitePieces[i]->GetStartOffset(), "Piece Starting Offset");
+									PrintVec2Data(glm::vec2(x, y), "Mouse Position");
+
+								};
+							}
+						}
+						else if (currentTurn == Black) {
+							for (int i = 0; i < BlackPieces.size(); i++)
+							{
+								if (BlackPieces[i]->HitDetection(ScreenPosToOffset(glm::vec2(x * -1, y)), false)) {
+									currentSelectedPiece = BlackPieces[i];
+									std::cout << currentSelectedPiece->GetTypeName() << "\n";
+									PrintVec2Data(BlackPieces[i]->GetOffset(), "Piece Current Offset");
+									PrintVec2Data(BlackPieces[i]->GetStartOffset(), "Piece Starting Offset");
+									PrintVec2Data(glm::vec2(x, y), "Mouse Position");
+								}
+							}
 						}
 
 						PrintVec2Data(ScreenPosToOffset(glm::vec2(x, y)), "Mouse Offset - add 8 to x for board pos");
@@ -167,9 +189,10 @@ void Game::Tick()
 				}
 				else {
 					if (currentSelectedPiece) {
-						currentSelectedPiece->SetOffset(currentSelectedPiece->GetStartOffset());
-
-
+						//pass in true here because for some reason the movement works with both black and white when using -8
+						currentSelectedPiece->SetOffset(currentSelectedPiece->GetStartOffset(), true);
+						moves.clear();
+						board->DisplayMoves(moves);
 						spriteRenderer->MoveSpriteInstance(currentSelectedPiece->GetStartOffset(),
 							currentSelectedPiece->GetArrayIndex());
 						currentSelectedPiece = nullptr;
@@ -182,7 +205,9 @@ void Game::Tick()
 			}
 		}
 
+		//move the piece to the mouse position
 		if (currentSelectedPiece) {
+			board->DisplayMoves(moves);
 			SDL_GetMouseState(&x, &y);
 			glm::vec2 movePosition = ScreenPosToOffset(glm::vec2(x, y));
 			movePosition.x += 7;
@@ -225,18 +250,20 @@ void Chess::Game::SetupPieces()
 		WhitePieces.push_back(new Pawn(WHITE, ScreenPosToOffset(glm::vec2(i * 100 + 700, 600)), i + 7));
 	}
 
-	BlackPieces.push_back(new Rook(BLACK, ScreenPosToOffset(glm::vec2(800, 0)), 15));
-	BlackPieces.push_back(new Knight(BLACK, ScreenPosToOffset(glm::vec2(900, 0)), 16));
-	BlackPieces.push_back(new Bishop(BLACK, ScreenPosToOffset(glm::vec2(1000, 0)), 17));
-	BlackPieces.push_back(new Queen(BLACK, ScreenPosToOffset(glm::vec2(1100, 0)), 18));
-	BlackPieces.push_back(new King(BLACK, ScreenPosToOffset(glm::vec2(1200, 0)), 19));
-	BlackPieces.push_back(new Bishop(BLACK, ScreenPosToOffset(glm::vec2(1300, 0)), 20));
-	BlackPieces.push_back(new Knight(BLACK, ScreenPosToOffset(glm::vec2(1400, 0)), 21));
-	BlackPieces.push_back(new Rook(BLACK, ScreenPosToOffset(glm::vec2(1500, 0)), 22));
+	//original black piece positions were off by 1 so my duct tape solution was to slide them over and adjust the position of the sprite
+	//which is why these go from 700 - 1400, and the white go from 800 - 1500
+	BlackPieces.push_back(new Rook(BLACK, ScreenPosToOffset(glm::vec2(700, 0)), 15));
+	BlackPieces.push_back(new Knight(BLACK, ScreenPosToOffset(glm::vec2(800, 0)), 16));
+	BlackPieces.push_back(new Bishop(BLACK, ScreenPosToOffset(glm::vec2(900, 0)), 17));
+	BlackPieces.push_back(new Queen(BLACK, ScreenPosToOffset(glm::vec2(1000, 0)), 18));
+	BlackPieces.push_back(new King(BLACK, ScreenPosToOffset(glm::vec2(1100, 0)), 19));
+	BlackPieces.push_back(new Bishop(BLACK, ScreenPosToOffset(glm::vec2(1200, 0)), 20));
+	BlackPieces.push_back(new Knight(BLACK, ScreenPosToOffset(glm::vec2(1300, 0)), 21));
+	BlackPieces.push_back(new Rook(BLACK, ScreenPosToOffset(glm::vec2(1400, 0)), 22));
 
 	for (int i = 1; i < 9; i++)
 	{
-		BlackPieces.push_back(new Pawn(BLACK, ScreenPosToOffset(glm::vec2(i * 100 + 700, 100)), i + 22));
+		BlackPieces.push_back(new Pawn(BLACK, ScreenPosToOffset(glm::vec2(i * 100 + 600, 100)), i + 22));
 	} 
 
 	for (int i = 0; i < WhitePieces.size(); i++)
@@ -256,6 +283,11 @@ void Chess::Game::SetupPieces()
 
 	spriteRenderer->SetupBuffer();
 	drawables.push_back(spriteRenderer);
+}
+
+void Chess::Game::SwapTurn()
+{
+	currentTurn = (currentTurn == White ? Turn::Black : Turn::White);
 }
 
 glm::vec2 Chess::Game::ScreenPosToOffset(const glm::vec2& screenCoords)

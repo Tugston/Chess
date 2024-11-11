@@ -22,3 +22,8 @@ void Chess::Rook::Selected()
 void Chess::Rook::DeSelected()
 {
 }
+
+std::vector<glm::vec2> Chess::Rook::GetAvailableMoves(glm::vec2 currentPosition)
+{
+	return std::vector<glm::vec2>();
+}

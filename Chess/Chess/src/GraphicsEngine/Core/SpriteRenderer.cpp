@@ -154,7 +154,10 @@ void GraphicsEngine::SpriteRenderer::MoveSpriteInstance(glm::vec2 offset, const 
 
 	translations.at(instanceNum) = offset;
 
-	SendSpriteInstancesToGPU();
+	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	glBufferSubData(GL_ARRAY_BUFFER, instanceNum * sizeof(glm::vec2), sizeof(glm::vec2), &translations.at(instanceNum));
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//SendSpriteInstancesToGPU();
 }
 
 void GraphicsEngine::SpriteRenderer::AddSpriteID(int id)

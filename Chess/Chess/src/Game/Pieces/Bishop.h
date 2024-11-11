@@ -15,7 +15,8 @@ namespace Chess {
 
 		void Selected();
 		void DeSelected();
-
+		
+		
 	private:
 
 	};

@@ -35,6 +35,11 @@ namespace Chess {
 
 	class BasePiece;
 
+	enum Turn {
+		Black,
+		White
+	};
+
 	class Game {
 	public:
 
@@ -49,9 +54,12 @@ namespace Chess {
 
 	
 		void SetupPieces();
+		void SwapTurn();
 
 		glm::vec2 ScreenPosToOffset(const glm::vec2& screenCoords);
 		glm::vec2 OffsetToScreenPos(glm::vec2 offset);
+
+
 
 		void PrintVec2Data(glm::vec2 x, std::string name);
 
@@ -78,5 +86,9 @@ namespace Chess {
 
 		Uint32 lastUpdateTime;
 
+		Turn currentTurn;
+
+		//all the moves a piece can go to when you pick it up
+		std::vector<glm::vec2> moves;
 	};
 }

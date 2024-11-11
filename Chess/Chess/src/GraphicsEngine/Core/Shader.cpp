@@ -36,6 +36,11 @@ void GraphicsEngine::Shader::SetUniformVec2(const glm::vec2& x, const std::strin
 	glUniform2fv(glGetUniformLocation(program, name.c_str()), 1, glm::value_ptr(x));
 }
 
+void GraphicsEngine::Shader::SetUniformInt(const int& x, const std::string& name)
+{
+	glCheck(glUniform1i(glGetUniformLocation(program, name.c_str()), x));
+}
+
 GraphicsEngine::ShaderProgramSource GraphicsEngine::Shader::ParseShader(const std::string& vertexFilePath, const std::string& fragFilePath)
 {
 	std::string vertSrc;
@@ -84,7 +89,7 @@ GraphicsEngine::ShaderProgramSource GraphicsEngine::Shader::ParseShader(const st
 int GraphicsEngine::Shader::CompileShader(unsigned int type, const std::string& src)
 {
 	//create and compile shader in gl
-	std::cout << src << "\n\n";
+	  //std::cout << src << "\n\n";
 	const char* source = src.c_str();
 	unsigned int id = glCreateShader(type);
 	glCheck(glShaderSource(id, 1, &source, NULL));
@@ -120,7 +125,7 @@ unsigned int GraphicsEngine::Shader::CreateShader(const std::string& vertShader,
 	glGetProgramiv(tempProgram, GL_LINK_STATUS, &x);
 	if (!x) {
 		glGetProgramInfoLog(tempProgram, 512, NULL, info);
-		std::cout << "\n\nShader Compilation Error: " << info << "\n";
+		std::cout << "\n\nShader Attach Error: " << info << "\n";
 	}
 
 	glCheck(glValidateProgram(tempProgram));

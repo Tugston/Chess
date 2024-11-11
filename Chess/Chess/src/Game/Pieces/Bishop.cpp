@@ -24,3 +24,5 @@ void Chess::Bishop::Selected()
 void Chess::Bishop::DeSelected()
 {
 }
+
+

@@ -57,6 +57,21 @@ void Chess::Board::Draw()
 	glDrawElements(GL_TRIANGLES, 6 * 64, GL_UNSIGNED_INT, 0);
 }
 
+void Chess::Board::DisplayMoves(const std::vector<glm::vec2>& moves)
+{
+	shader->Use();
+
+	shader->SetUniformInt(moves.size(), "numMoves");
+
+	std::cout << "Display Moves";
+
+	for (int i = 0; i < moves.size(); i++)
+	{
+		shader->SetUniformVec2(glm::vec2(moves[i].x, moves[i].y + 7), "movePositions[" + std::to_string(i) + "]");
+	}
+	
+}
+
 void Chess::Board::SetupData()
 {
 	//chess board is 8x8, doesn't need window size or anything
