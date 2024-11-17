@@ -63,7 +63,7 @@ void Chess::Board::DisplayMoves(const std::vector<glm::vec2>& moves)
 
 	shader->SetUniformInt(moves.size(), "numMoves");
 
-	std::cout << "Display Moves";
+	//std::cout << "Display Moves";
 
 	for (int i = 0; i < moves.size(); i++)
 	{

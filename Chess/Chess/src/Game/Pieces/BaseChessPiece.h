@@ -54,16 +54,27 @@ namespace Chess {
 		//returns true if within bounds
 		bool HitDetection(glm::vec2 position, const bool& whiteTurn);
 
-		//Get all move location
-		//returns all the positions to be determined later; ie capturing, same team blocking, and what not
-		bool GetMoves(glm::vec2 mousePosition, std::vector<glm::vec2>& moveGameStorage, const bool& whiteTurn);
+		//Get all possible move locations
+		//calculates them
+		bool GetMoves(glm::vec2 mousePosition, std::vector<glm::vec2>& moveGameStorage, const bool& whiteTurn,
+			const std::vector<glm::vec2>& whitePiecePostions, const std::vector<glm::vec2>& blackPiecePositions);
+
+		//Get all possible move locations
+		//gets the calculated moves
+		bool GetMoves(glm::vec2 mousePosition, std::vector<glm::vec2>& moveGameStorage);
 
 	
 
 	private:
 
 		//returns all possible moves for each piece
-		std::vector<glm::vec2> GetAvailableMoves(const glm::vec2& mousePosition);
+		std::vector<glm::vec2> GetAvailableMoves(const glm::vec2& mousePosition, const std::vector<glm::vec2>& whitePiecePositions,
+			const std::vector<glm::vec2>& blackPiecePositions);
+
+		//checks to see if the position is within the board
+		//if it is, returns the position, if not, returns null
+		void BoundsCheck(const glm::vec2& position, std::vector<glm::vec2>& positions, const std::vector<glm::vec2>& whitePiecePositions,
+			const std::vector<glm::vec2>& blackPiecePositions, std::vector<bool>& PieceDetections, unsigned int currentIndex);
 
 	protected:
 		//drawing stuff
@@ -82,6 +93,8 @@ namespace Chess {
 		//storing the actual offset of the moves rather than the actual board position or rather the gl offset value
 		std::vector<glm::vec2> moveOffsets;
 		
+		//store the moves of each piece for the overload GetMoves function that doesn't need to calculate anything
+		std::vector<glm::vec2> moves;
 	};
 
 }

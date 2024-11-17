@@ -127,16 +127,24 @@ void Game::Tick()
 
 					if (currentSelectedPiece)
 					{
-						bool canMove = currentSelectedPiece->GetMoves(ScreenPosToOffset(glm::vec2(x * -1, y)), moves, (currentTurn == White) ? true : false);
+						bool canMove = currentSelectedPiece->GetMoves(ScreenPosToOffset(glm::vec2(x * -1, y)), moves);
+						//ValidateMoves();
 						for (int i = 0; i < moves.size(); i++)
 						{
 							PrintVec2Data(moves.at(i), "Move " + std::to_string(i));
+							if (moves[i] == ScreenPosToOffset(glm::vec2(x * -1, y))) {
+								canMove = true;
+								break;
+							}
 						}
+
+						
 
 						if (canMove) {
 							currentSelectedPiece->SetOffset(ScreenPosToOffset(glm::vec2(x * -1, y)), (currentTurn == White) ? true : false);
 							currentSelectedPiece->SetStartOffset(ScreenPosToOffset(glm::vec2(x * -1, y)), (currentTurn == WHITE) ? true : false);
 
+							//clear moves
 							moves.clear();
 							board->DisplayMoves(moves);
 
@@ -161,8 +169,13 @@ void Game::Tick()
 							{
 								if (WhitePieces[i]->HitDetection(ScreenPosToOffset(glm::vec2(x * -1, y)), true)) {
 									currentSelectedPiece = WhitePieces[i];
+									currentSelectedPiece->GetMoves(ScreenPosToOffset(glm::vec2(x * -1, y)), moves, (currentTurn == White) ? true : false, 
+										GetPiecePositions(White), GetPiecePositions(Black));
+									for (int i = 0; i < moves.size(); i++)
+									{
+										PrintVec2Data(moves.at(i), "Move " + std::to_string(i));
+									}
 
-									currentSelectedPiece->GetMoves(ScreenPosToOffset(glm::vec2(x * -1, y)), moves, (currentTurn == White) ? true : false);
 									std::cout << currentSelectedPiece->GetTypeName() << "\n";
 									PrintVec2Data(WhitePieces[i]->GetOffset(), "Piece Current Offset");
 									PrintVec2Data(WhitePieces[i]->GetStartOffset(), "Piece Starting Offset");
@@ -176,6 +189,13 @@ void Game::Tick()
 							{
 								if (BlackPieces[i]->HitDetection(ScreenPosToOffset(glm::vec2(x * -1, y)), false)) {
 									currentSelectedPiece = BlackPieces[i];
+									currentSelectedPiece->GetMoves(ScreenPosToOffset(glm::vec2(x * -1, y)), moves, (currentTurn == White) ? true : false,
+										GetPiecePositions(White), GetPiecePositions(Black));
+									for (int i = 0; i < moves.size(); i++)
+									{
+										PrintVec2Data(moves.at(i), "Move " + std::to_string(i));
+									}
+
 									std::cout << currentSelectedPiece->GetTypeName() << "\n";
 									PrintVec2Data(BlackPieces[i]->GetOffset(), "Piece Current Offset");
 									PrintVec2Data(BlackPieces[i]->GetStartOffset(), "Piece Starting Offset");
@@ -205,7 +225,7 @@ void Game::Tick()
 			}
 		}
 
-		//move the piece to the mouse position
+		//move the piece with the mouse position
 		if (currentSelectedPiece) {
 			board->DisplayMoves(moves);
 			SDL_GetMouseState(&x, &y);
@@ -319,6 +339,24 @@ glm::vec2 Chess::Game::OffsetToScreenPos(glm::vec2 offset)
 	int y = offset.y * cellSize;
 
 	return glm::vec2(x, y);
+}
+
+std::vector<glm::vec2> Chess::Game::GetPiecePositions(Turn turn)
+{
+	std::vector<glm::vec2> x;
+	if (turn == White) {
+		for (int i = 0; i < WhitePieces.size(); i++) {
+			x.push_back(WhitePieces[i]->GetStartOffset());
+		}
+	}
+	else {
+		for (int i = 0; i < BlackPieces.size(); i++)
+		{
+			x.push_back(BlackPieces[i]->GetStartOffset());
+		}
+	}
+
+	return x;
 }
 
 void Chess::Game::PrintVec2Data(glm::vec2 x, std::string name)

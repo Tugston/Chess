@@ -59,6 +59,12 @@ namespace Chess {
 		glm::vec2 ScreenPosToOffset(const glm::vec2& screenCoords);
 		glm::vec2 OffsetToScreenPos(glm::vec2 offset);
 
+		std::vector<glm::vec2> GetPiecePositions(Turn turn);
+		
+		
+
+
+
 
 
 		void PrintVec2Data(glm::vec2 x, std::string name);

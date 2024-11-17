@@ -78,21 +78,19 @@ bool Chess::BasePiece::HitDetection(glm::vec2 position, const bool& whiteTurn)
 	//return (position.x <= boundary.x && position.y <= boundary.y && position.x >= startingOffset.x && position.y >= startingOffset.y);
 }
 
-bool Chess::BasePiece::GetMoves(glm::vec2 mousePosition, std::vector<glm::vec2>& moveGameStorage, const bool& whiteTurn)
+
+bool Chess::BasePiece::GetMoves(glm::vec2 mousePosition, std::vector<glm::vec2>& moveGameStorage, const bool& whiteTurn,
+	const std::vector<glm::vec2>& whitePiecePostions, const std::vector<glm::vec2>& blackPiecePositions)
 {
 	mousePosition.x = -mousePosition.x - 8;
 
-	//if (color == BLACK) {
-		//mousePosition.x = mousePosition.x - 1;
-	//}
 	
-	std::vector<glm::vec2> moves = this->GetAvailableMoves(startingOffset);
+	moves = this->GetAvailableMoves(startingOffset, whitePiecePostions, blackPiecePositions);
 	moveGameStorage = moves;
 
 	for (int i = 0; i < moves.size(); i++)
 	{
 		if (mousePosition == moves.at(i)) {
-			std::cout << "Valid Spot!";
 			return true;
 		}
 	}
@@ -100,21 +98,39 @@ bool Chess::BasePiece::GetMoves(glm::vec2 mousePosition, std::vector<glm::vec2>&
 	return false;
 }
 
-std::vector<glm::vec2> Chess::BasePiece::GetAvailableMoves(const glm::vec2& mousePosition)
+bool Chess::BasePiece::GetMoves(glm::vec2 mousePosition, std::vector<glm::vec2>& moveGameStorage)
+{
+	mousePosition.x = -mousePosition.x - 8;
+	moveGameStorage = moves;
+	for (int i = 0; i < moves.size(); i++)
+	{
+		if (mousePosition == moves[i]) {
+			return true;
+		}
+	}
+	return false;
+}
+
+std::vector<glm::vec2> Chess::BasePiece::GetAvailableMoves(const glm::vec2& mousePosition, const std::vector<glm::vec2>& whitePiecePositions,
+	const std::vector<glm::vec2>& blackPiecePositions)
 {
 	std::vector<glm::vec2> positions;
+	std::vector<bool> PieceDetection; // determines if each track has hit a piece or not
 
 	//have 0 clue how to handle en passant with pieces
+	//or castling
 
 	if (color == WHITE)
 	{
 		if (type == PAWN) {
-			positions.push_back(glm::vec2(mousePosition.x, mousePosition.y + 1));
-			positions.push_back(glm::vec2(mousePosition.x - 1, mousePosition.y + 1));
-			positions.push_back(glm::vec2(mousePosition.x + 1, mousePosition.y + 1));
+			PieceDetection = std::vector<bool>{false, false, false, false};
+			BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 0);
+			BoundsCheck(glm::vec2(mousePosition.x - 1, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 1);
+			BoundsCheck(glm::vec2(mousePosition.x + 1, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 2);
 			if (mousePosition.y == -6) {
-				positions.push_back(glm::vec2(mousePosition.x, mousePosition.y + 2));
+				BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y + 2), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 3);
 			}
+
 			return positions;
 		}
 	}
@@ -122,11 +138,12 @@ std::vector<glm::vec2> Chess::BasePiece::GetAvailableMoves(const glm::vec2& mous
 		std::cout << "Black";
 
 		if (type == PAWN) {
-			positions.push_back(glm::vec2(mousePosition.x, mousePosition.y - 1));
-			positions.push_back(glm::vec2(mousePosition.x - 1, mousePosition.y - 1));
-			positions.push_back(glm::vec2(mousePosition.x + 1, mousePosition.y - 1));
+			PieceDetection = std::vector<bool>{ false, false, false, false};
+			BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 0);
+			BoundsCheck(glm::vec2(mousePosition.x - 1, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 1);
+			BoundsCheck(glm::vec2(mousePosition.x + 1, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 2);
 			if (mousePosition.y == -1) {
-				positions.push_back(glm::vec2(mousePosition.x, mousePosition.y - 2));
+				BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y - 2), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 3);
 			}
 			return positions;
 		}
@@ -134,68 +151,140 @@ std::vector<glm::vec2> Chess::BasePiece::GetAvailableMoves(const glm::vec2& mous
 
 	if(type == ROOK)
 	{
-		//not gonna worry about going outside the board, may have to fix this later
+		PieceDetection = std::vector<bool>{ false, false, false, false };
 		for (int i = 1; i < 8; i++)
 		{
-			positions.push_back(glm::vec2(mousePosition.x + i, mousePosition.y));
-			positions.push_back(glm::vec2(mousePosition.x, mousePosition.y + i));
-			positions.push_back(glm::vec2(mousePosition.x, mousePosition.y - i));
-			positions.push_back(glm::vec2(mousePosition.x - i, mousePosition.y));
+			
+			BoundsCheck(glm::vec2(mousePosition.x + i, mousePosition.y), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 0);
+			BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y + i), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 1);
+			BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y - i), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 2);
+			BoundsCheck(glm::vec2(mousePosition.x - i, mousePosition.y), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 3);
 		}
 
 		return positions;
 	}
 	else if (type == BISHOP)
 	{
+		PieceDetection = std::vector<bool>{ false, false, false, false };
 		for (int i = 1; i < 8; i++)
 		{
-			positions.push_back(glm::vec2(mousePosition.x + i, mousePosition.y - i));
-			positions.push_back(glm::vec2(mousePosition.x + i, mousePosition.y + i));
-			positions.push_back(glm::vec2(mousePosition.x - i, mousePosition.y - i));
-			positions.push_back(glm::vec2(mousePosition.x - i, mousePosition.y + i));
+			BoundsCheck(glm::vec2(mousePosition.x + i, mousePosition.y - i), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 0);
+			BoundsCheck(glm::vec2(mousePosition.x + i, mousePosition.y + i), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 1);
+			BoundsCheck(glm::vec2(mousePosition.x - i, mousePosition.y - i), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 2);
+			BoundsCheck(glm::vec2(mousePosition.x - i, mousePosition.y + i), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 3);
 		}
 
 		return positions;
 	}
 	else if (type == KNIGHT)
 	{
-		positions.push_back(glm::vec2(mousePosition.x - 1, mousePosition.y - 2));
-		positions.push_back(glm::vec2(mousePosition.x - 2, mousePosition.y - 1));
-		positions.push_back(glm::vec2(mousePosition.x + 1, mousePosition.y - 2));
-		positions.push_back(glm::vec2(mousePosition.x + 2, mousePosition.y - 1));
-		positions.push_back(glm::vec2(mousePosition.x + 1, mousePosition.y + 2));
-		positions.push_back(glm::vec2(mousePosition.x + 2, mousePosition.y + 1));
-		positions.push_back(glm::vec2(mousePosition.x - 1, mousePosition.y + 2));
-		positions.push_back(glm::vec2(mousePosition.x - 2, mousePosition.y + 1));
+		PieceDetection = std::vector<bool>{ false, false, false, false, false, false, false, false };
+		BoundsCheck(glm::vec2(mousePosition.x - 1, mousePosition.y - 2), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 0);
+		BoundsCheck(glm::vec2(mousePosition.x - 2, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 1);
+		BoundsCheck(glm::vec2(mousePosition.x + 1, mousePosition.y - 2), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 2);
+		BoundsCheck(glm::vec2(mousePosition.x + 2, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 3);
+		BoundsCheck(glm::vec2(mousePosition.x + 1, mousePosition.y + 2), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 4);
+		BoundsCheck(glm::vec2(mousePosition.x + 2, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 5);
+		BoundsCheck(glm::vec2(mousePosition.x - 1, mousePosition.y + 2), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 6);
+		BoundsCheck(glm::vec2(mousePosition.x - 2, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 7);
 		return positions;
 	}
 	else if (type == KING) {
-		positions.push_back(glm::vec2(mousePosition.x + 1, mousePosition.y + 1));
-		positions.push_back(glm::vec2(mousePosition.x + 1, mousePosition.y));
-		positions.push_back(glm::vec2(mousePosition.x + 1, mousePosition.y - 1));
-		positions.push_back(glm::vec2(mousePosition.x, mousePosition.y - 1));
-		positions.push_back(glm::vec2(mousePosition.x - 1, mousePosition.y - 1));
-		positions.push_back(glm::vec2(mousePosition.x - 1, mousePosition.y));
-		positions.push_back(glm::vec2(mousePosition.x - 1, mousePosition.y + 1));
-		positions.push_back(glm::vec2(mousePosition.x, mousePosition.y + 1));
+		PieceDetection = std::vector<bool>{ false, false, false, false, false, false, false, false };
+		BoundsCheck(glm::vec2(mousePosition.x + 1, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 0);
+		BoundsCheck(glm::vec2(mousePosition.x + 1, mousePosition.y), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 1);
+		BoundsCheck(glm::vec2(mousePosition.x + 1, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 2);
+		BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 3);
+		BoundsCheck(glm::vec2(mousePosition.x - 1, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 4);
+		BoundsCheck(glm::vec2(mousePosition.x - 1, mousePosition.y), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 5);
+		BoundsCheck(glm::vec2(mousePosition.x - 1, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 6);
+		BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 7);
+
 		return positions;
 	}
 	else if (type == QUEEN) {
+		PieceDetection = std::vector<bool>{ false, false, false, false, false, false, false, false };
 		for (int i = 1; i < 8; i++)
 		{
-			positions.push_back(glm::vec2(mousePosition.x + i, mousePosition.y));
-			positions.push_back(glm::vec2(mousePosition.x, mousePosition.y + i));
-			positions.push_back(glm::vec2(mousePosition.x, mousePosition.y - i));
-			positions.push_back(glm::vec2(mousePosition.x - i, mousePosition.y));
-			positions.push_back(glm::vec2(mousePosition.x + i, mousePosition.y - i));
-			positions.push_back(glm::vec2(mousePosition.x + i, mousePosition.y + i));
-			positions.push_back(glm::vec2(mousePosition.x - i, mousePosition.y - i));
-			positions.push_back(glm::vec2(mousePosition.x - i, mousePosition.y + i));
+			BoundsCheck(glm::vec2(mousePosition.x + i, mousePosition.y), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 0);
+			BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y + i), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 1);
+			BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y - i), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 2);
+			BoundsCheck(glm::vec2(mousePosition.x - i, mousePosition.y), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 3);
+			BoundsCheck(glm::vec2(mousePosition.x + i, mousePosition.y - i), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 4);
+			BoundsCheck(glm::vec2(mousePosition.x + i, mousePosition.y + i), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 5);
+			BoundsCheck(glm::vec2(mousePosition.x - i, mousePosition.y - i), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 6);
+			BoundsCheck(glm::vec2(mousePosition.x - i, mousePosition.y + i), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 7);
 		}
 		return positions;
 	}
 
 	//return positions;
+}
+
+void Chess::BasePiece::BoundsCheck(const glm::vec2& position, std::vector<glm::vec2>& positions, const std::vector<glm::vec2>& whitePositions,
+	const std::vector<glm::vec2>& blackPositions, std::vector<bool>& PieceDetections, unsigned int currentIndex)
+{
+
+	bool positionPushedBack = false;
+
+	//check if this "branch" has already resulted in finding a piece
+	if (!PieceDetections[currentIndex]) {
+		if (color == WHITE) {
+			//if white piece loop has same spot, then don't push back the position, and set the PieceDetection index to true
+			//if black piece loop has same spot, then push back that position, and set the PieceDetection index to true
+
+
+
+			//loop through all the white pieces
+			for (int i = 0; i < whitePositions.size(); i++) {
+				if (whitePositions[i] == position) {
+					PieceDetections[currentIndex] = true;
+					positionPushedBack = true;
+					break;
+				}
+			}
+
+			//loop through all the black pieces
+			if (!positionPushedBack) {
+				for (int i = 0; i < blackPositions.size(); i++) {
+					if (blackPositions[i] == position) {
+						PieceDetections[currentIndex] = true;
+						positions.push_back(position);
+						positionPushedBack = true;
+					}
+				}
+			}
+
+
+		}
+		else {
+			// do the same for black but flipped
+
+			for (int i = 0; i < whitePositions.size(); i++) {
+				if (whitePositions[i] == position) {
+					PieceDetections[currentIndex] = true;
+					positions.push_back(position);
+					positionPushedBack = true;
+				}
+			}
+
+			for (int i = 0; i < blackPositions.size(); i++)
+			{
+				if (blackPositions[i] == position) {
+					PieceDetections[currentIndex] = true;
+					positionPushedBack = true;
+				}
+			}
+		}
+
+
+
+		//if the position is just an empty space
+		if (!positionPushedBack && position.x >= 0 && position.y <= 0 && position.x <= 7 && position.y >= -7)
+		{
+			positions.push_back(position);
+		}
+	}
 }
 
 
