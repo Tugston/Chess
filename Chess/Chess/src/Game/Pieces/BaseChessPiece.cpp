@@ -41,19 +41,24 @@ std::string Chess::BasePiece::GetTypeName()
 	return "";
 }
 
-void Chess::BasePiece::SetOffset(glm::vec2 offset, const bool& whiteTurn)
+void Chess::BasePiece::SetOffset(glm::vec2 offset)
 {
 	offset.x = -offset.x - 8;
 	this->offset = offset;
 }
 
-void Chess::BasePiece::SetStartOffset(glm::vec2 offset, const bool& whiteTurn)
+void Chess::BasePiece::SetStartOffset(glm::vec2 offset)
 {
 	offset.x = -offset.x - 8;
 
 	
 	this->startingOffset = offset;
 	//boundary = glm::vec2(offset.x + 1, offset.y + 1);
+}
+
+void Chess::BasePiece::SetArrayIndex(unsigned int index)
+{
+	this->arrayIndex = index;
 }
 
 unsigned int Chess::BasePiece::GetArrayIndex()
@@ -124,11 +129,37 @@ std::vector<glm::vec2> Chess::BasePiece::GetAvailableMoves(const glm::vec2& mous
 	{
 		if (type == PAWN) {
 			PieceDetection = std::vector<bool>{false, false, false, false};
-			BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 0);
-			BoundsCheck(glm::vec2(mousePosition.x - 1, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 1);
-			BoundsCheck(glm::vec2(mousePosition.x + 1, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 2);
-			if (mousePosition.y == -6) {
-				BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y + 2), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 3);
+			bool canMoveForward = true;
+			
+			
+			
+
+			//check moves for blocking
+			for (int i = 0; i < blackPiecePositions.size(); i++)
+			{
+				if (blackPiecePositions[i] == glm::vec2(mousePosition.x, mousePosition.y + 1)) {
+					canMoveForward = false;
+				}
+				
+
+				//left diagonal capture
+				if (blackPiecePositions[i] == glm::vec2(mousePosition.x - 1, mousePosition.y + 1)) {
+					BoundsCheck(glm::vec2(mousePosition.x - 1, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 1);
+				}
+
+				//right diagonal capture
+				if (blackPiecePositions[i] == glm::vec2(mousePosition.x + 1, mousePosition.y + 1)) {
+					BoundsCheck(glm::vec2(mousePosition.x + 1, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 2);
+				}
+			}
+
+			//double move at start
+			if (canMoveForward) {
+				BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 0);
+
+				if (mousePosition.y == -6) {
+					BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y + 2), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 3);
+				}
 			}
 
 			return positions;
@@ -140,11 +171,22 @@ std::vector<glm::vec2> Chess::BasePiece::GetAvailableMoves(const glm::vec2& mous
 		if (type == PAWN) {
 			PieceDetection = std::vector<bool>{ false, false, false, false};
 			BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 0);
-			BoundsCheck(glm::vec2(mousePosition.x - 1, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 1);
-			BoundsCheck(glm::vec2(mousePosition.x + 1, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 2);
+
 			if (mousePosition.y == -1) {
 				BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y - 2), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 3);
 			}
+
+			for (int i = 0; i < whitePiecePositions.size(); i++)
+			{
+				if (whitePiecePositions[i] == glm::vec2(mousePosition.x - 1, mousePosition.y - 1)) {
+					BoundsCheck(glm::vec2(mousePosition.x - 1, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 1);
+				}
+
+				if (whitePiecePositions[i] == glm::vec2(mousePosition.x + 1, mousePosition.y - 1)) {
+					BoundsCheck(glm::vec2(mousePosition.x + 1, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 2);
+				}
+			}
+			
 			return positions;
 		}
 	}
@@ -233,8 +275,6 @@ void Chess::BasePiece::BoundsCheck(const glm::vec2& position, std::vector<glm::v
 			//if white piece loop has same spot, then don't push back the position, and set the PieceDetection index to true
 			//if black piece loop has same spot, then push back that position, and set the PieceDetection index to true
 
-
-
 			//loop through all the white pieces
 			for (int i = 0; i < whitePositions.size(); i++) {
 				if (whitePositions[i] == position) {
@@ -251,6 +291,8 @@ void Chess::BasePiece::BoundsCheck(const glm::vec2& position, std::vector<glm::v
 						PieceDetections[currentIndex] = true;
 						positions.push_back(position);
 						positionPushedBack = true;
+						takeIndexes.push_back(i);
+						break;
 					}
 				}
 			}
@@ -265,14 +307,19 @@ void Chess::BasePiece::BoundsCheck(const glm::vec2& position, std::vector<glm::v
 					PieceDetections[currentIndex] = true;
 					positions.push_back(position);
 					positionPushedBack = true;
+					takeIndexes.push_back(i);
+					break;
 				}
 			}
 
-			for (int i = 0; i < blackPositions.size(); i++)
-			{
-				if (blackPositions[i] == position) {
-					PieceDetections[currentIndex] = true;
-					positionPushedBack = true;
+			if (!positionPushedBack) {
+				for (int i = 0; i < blackPositions.size(); i++)
+				{
+					if (blackPositions[i] == position) {
+						PieceDetections[currentIndex] = true;
+						positionPushedBack = true;
+						break;
+					}
 				}
 			}
 		}

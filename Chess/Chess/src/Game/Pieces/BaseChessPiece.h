@@ -41,14 +41,17 @@ namespace Chess {
 
 
 		//setters
-		void SetOffset(glm::vec2 offset, const bool& whiteTurn);
-		void SetStartOffset(glm::vec2 offset, const bool& whiteTurn);
+		void SetOffset(glm::vec2 offset);
+		void SetStartOffset(glm::vec2 offset);
+		void SetArrayIndex(unsigned int index);
 
 		//returns the inherited textureID
 		unsigned int GetTextureID() { return textureID; };
 
 		//returns the array position this piece is at in the sprite renderer array of all sprites
 		unsigned int GetArrayIndex();
+
+		std::vector<unsigned int> GetTakeIndexes() { return takeIndexes; };
 
 		//determines if the position is between offset and boundary
 		//returns true if within bounds
@@ -62,6 +65,8 @@ namespace Chess {
 		//Get all possible move locations
 		//gets the calculated moves
 		bool GetMoves(glm::vec2 mousePosition, std::vector<glm::vec2>& moveGameStorage);
+
+
 
 	
 
@@ -95,6 +100,9 @@ namespace Chess {
 		
 		//store the moves of each piece for the overload GetMoves function that doesn't need to calculate anything
 		std::vector<glm::vec2> moves;
+
+		//list of all the index's for opposing pieces
+		std::vector<unsigned int> takeIndexes;
 	};
 
 }

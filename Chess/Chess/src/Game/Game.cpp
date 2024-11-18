@@ -128,21 +128,18 @@ void Game::Tick()
 					if (currentSelectedPiece)
 					{
 						bool canMove = currentSelectedPiece->GetMoves(ScreenPosToOffset(glm::vec2(x * -1, y)), moves);
-						//ValidateMoves();
+						
 						for (int i = 0; i < moves.size(); i++)
 						{
 							PrintVec2Data(moves.at(i), "Move " + std::to_string(i));
-							if (moves[i] == ScreenPosToOffset(glm::vec2(x * -1, y))) {
-								canMove = true;
-								break;
-							}
 						}
 
-						
-
 						if (canMove) {
-							currentSelectedPiece->SetOffset(ScreenPosToOffset(glm::vec2(x * -1, y)), (currentTurn == White) ? true : false);
-							currentSelectedPiece->SetStartOffset(ScreenPosToOffset(glm::vec2(x * -1, y)), (currentTurn == WHITE) ? true : false);
+							//move piece
+							currentSelectedPiece->SetOffset(ScreenPosToOffset(glm::vec2(x * -1, y)));
+							currentSelectedPiece->SetStartOffset(ScreenPosToOffset(glm::vec2(x * -1, y)));
+
+							CapturePiece(x, y);
 
 							//clear moves
 							moves.clear();
@@ -210,7 +207,7 @@ void Game::Tick()
 				else {
 					if (currentSelectedPiece) {
 						//pass in true here because for some reason the movement works with both black and white when using -8
-						currentSelectedPiece->SetOffset(currentSelectedPiece->GetStartOffset(), true);
+						currentSelectedPiece->SetOffset(currentSelectedPiece->GetStartOffset());
 						moves.clear();
 						board->DisplayMoves(moves);
 						spriteRenderer->MoveSpriteInstance(currentSelectedPiece->GetStartOffset(),
@@ -308,6 +305,45 @@ void Chess::Game::SetupPieces()
 void Chess::Game::SwapTurn()
 {
 	currentTurn = (currentTurn == White ? Turn::Black : Turn::White);
+}
+
+void Chess::Game::CapturePiece(int x, int y)
+{
+	//capture any pieces
+	for (int i = 0; i < currentSelectedPiece->GetTakeIndexes().size(); i++)
+	{
+		//this loop only occurs a few times so shouldnt hurt throwing this here to use in white and black
+		glm::vec2 mousePos = ScreenPosToOffset(glm::vec2(x * -1, y));
+		mousePos.x = -mousePos.x - 8;
+
+		if (currentTurn == White) {
+			PrintVec2Data(BlackPieces[currentSelectedPiece->GetTakeIndexes().at(i)]->GetStartOffset(), "START OFFSET OF TAKE INDEX PIECE");
+			PrintVec2Data(ScreenPosToOffset(glm::vec2(x * -1, y)), "CURRENT MOUSE POSITION");
+			PrintVec2Data(glm::vec2(BlackPieces[currentSelectedPiece->GetTakeIndexes().at(i)]->GetArrayIndex(), -1), "X VALUE IS ARRAY INDEX");
+
+			if (BlackPieces[currentSelectedPiece->GetTakeIndexes().at(i)]->GetStartOffset() == mousePos) {
+
+				//set array index -1 for all pieces after the taken one
+				for (int y = currentSelectedPiece->GetTakeIndexes().at(i); y < BlackPieces.size(); y++) {
+					BlackPieces[y]->SetArrayIndex(BlackPieces[y]->GetArrayIndex() - 1);
+				}
+				//TRYING TO FIX THE OFFSET ISSUES WHEN TAKING PIECE
+				spriteRenderer->RemoveSprite(BlackPieces[currentSelectedPiece->GetTakeIndexes().at(i)]->GetArrayIndex());
+				
+				delete BlackPieces[currentSelectedPiece->GetTakeIndexes().at(i) - 1];
+				BlackPieces.erase(BlackPieces.begin() + currentSelectedPiece->GetTakeIndexes().at(i));
+				break;
+			}
+		}
+		else if (currentTurn == Black) {
+			if (WhitePieces[currentSelectedPiece->GetTakeIndexes().at(i)]->GetStartOffset() == mousePos) {
+				spriteRenderer->RemoveSprite(WhitePieces[currentSelectedPiece->GetTakeIndexes().at(i)]->GetArrayIndex());
+				delete WhitePieces[currentSelectedPiece->GetTakeIndexes().at(i)];
+				WhitePieces.erase(BlackPieces.begin() + currentSelectedPiece->GetTakeIndexes().at(i));
+				break;
+			}
+		}
+	}
 }
 
 glm::vec2 Chess::Game::ScreenPosToOffset(const glm::vec2& screenCoords)

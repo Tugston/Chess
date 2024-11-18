@@ -55,6 +55,7 @@ namespace Chess {
 	
 		void SetupPieces();
 		void SwapTurn();
+		void CapturePiece(int x, int y);
 
 		glm::vec2 ScreenPosToOffset(const glm::vec2& screenCoords);
 		glm::vec2 OffsetToScreenPos(glm::vec2 offset);

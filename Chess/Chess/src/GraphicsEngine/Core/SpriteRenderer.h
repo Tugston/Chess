@@ -22,6 +22,7 @@ namespace GraphicsEngine {
 		glm::mat4 GetModelMatrix() { return this->modelMatrix; };
 
 		void AddSpriteData(const glm::vec2& offset);
+		void RemoveSprite(int index);
 		//moves specified instance
 		void MoveSpriteInstance(glm::vec2 offset, const unsigned int& instanceNum);
 		void SendSpriteInstancesToGPU();

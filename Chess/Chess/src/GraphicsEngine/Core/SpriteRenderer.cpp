@@ -122,7 +122,8 @@ void GraphicsEngine::SpriteRenderer::Draw()
 	glCheck(glBindBuffer(GL_ARRAY_BUFFER, vbo));
 	glCheck(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo));
 
-	glCheck(glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, 32));
+	//draw the amnt of translations there are
+	glCheck(glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, translations.size()));
 	
 
 	//glCheck(glBindVertexArray(0));
@@ -133,6 +134,14 @@ void GraphicsEngine::SpriteRenderer::Draw()
 void GraphicsEngine::SpriteRenderer::AddSpriteData(const glm::vec2& offset)
 {
 	translations.push_back(offset);
+}
+
+void GraphicsEngine::SpriteRenderer::RemoveSprite(int index)
+{
+	translations.erase(translations.begin() + index);
+	SendSpriteInstancesToGPU();
+	textureIDs.erase(textureIDs.begin() + index);
+	SendTextureIdsToGPU();
 }
 
 void GraphicsEngine::SpriteRenderer::SendSpriteInstancesToGPU()
