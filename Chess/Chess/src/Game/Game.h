@@ -57,6 +57,11 @@ namespace Chess {
 		void SwapTurn();
 		void CapturePiece(int x, int y);
 
+		glm::vec2 CastleCheck(Chess::BasePiece* kingPiece);
+		bool CheckCastlingClear(int rookIndex, Chess::BasePiece* kingPiece, bool leftCheck);
+		void MakeCastlingMove(Chess::BasePiece* kingPiece, glm::vec2 mousePos, glm::vec2 rookIndexes);
+
+
 		glm::vec2 ScreenPosToOffset(const glm::vec2& screenCoords);
 		glm::vec2 OffsetToScreenPos(glm::vec2 offset);
 
@@ -67,7 +72,7 @@ namespace Chess {
 
 
 
-
+		void PrintPieceMovesAtMousePos(glm::vec2 mousePosition);
 		void PrintVec2Data(glm::vec2 x, std::string name);
 
 	private:

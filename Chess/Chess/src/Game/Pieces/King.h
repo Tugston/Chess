@@ -17,9 +17,11 @@ namespace Chess {
 
 		std::vector<glm::vec2> GetAvailableMoves(glm::vec2 currentPosition);
 
-	private:
+		std::string GetTypeName() override;
 
-
+	protected:
+		std::vector<glm::vec2> GetAvailableMoves(const glm::vec2& mousePosition, const std::vector<glm::vec2>& whitePiecePositions,
+			const std::vector<glm::vec2>& blackPiecePositions) override;
 
 	};
 

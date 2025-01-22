@@ -37,13 +37,16 @@ namespace Chess {
 
 		PieceType GetType() { return type; };
 
-		std::string GetTypeName();
+		bool GetHasMoved() { return hasMoved; };
+
+		virtual std::string GetTypeName();
 
 
 		//setters
 		void SetOffset(glm::vec2 offset);
 		void SetStartOffset(glm::vec2 offset);
 		void SetArrayIndex(unsigned int index);
+		void SetHasMoved(bool hasMoved);
 
 		//returns the inherited textureID
 		unsigned int GetTextureID() { return textureID; };
@@ -57,24 +60,28 @@ namespace Chess {
 		//returns true if within bounds
 		bool HitDetection(glm::vec2 position, const bool& whiteTurn);
 
-		//Get all possible move locations
-		//calculates them
-		bool GetMoves(glm::vec2 mousePosition, std::vector<glm::vec2>& moveGameStorage, const bool& whiteTurn,
+		//Set the moves for this piece
+		void SetMoves(glm::vec2 mousePosition, std::vector<glm::vec2>& moveGameStorage, const bool& whiteTurn,
 			const std::vector<glm::vec2>& whitePiecePostions, const std::vector<glm::vec2>& blackPiecePositions);
 
-		//Get all possible move locations
-		//gets the calculated moves
+		void AddMove(glm::vec2 movePosition, std::vector<glm::vec2>& moveGameStorage);
+
+		//Get moves with mouse position check
 		bool GetMoves(glm::vec2 mousePosition, std::vector<glm::vec2>& moveGameStorage);
 
+		//get all possible already existing move locations
+		//disregards mouse checks
+		std::vector<glm::vec2> GetMoves() { return moves; };
+
+		
 
 
-	
-
-	private:
-
+	protected:
 		//returns all possible moves for each piece
-		std::vector<glm::vec2> GetAvailableMoves(const glm::vec2& mousePosition, const std::vector<glm::vec2>& whitePiecePositions,
+		virtual std::vector<glm::vec2> GetAvailableMoves(const glm::vec2& mousePosition, const std::vector<glm::vec2>& whitePiecePositions,
 			const std::vector<glm::vec2>& blackPiecePositions);
+
+		
 
 		//checks to see if the position is within the board
 		//if it is, returns the position, if not, returns null
@@ -103,6 +110,9 @@ namespace Chess {
 
 		//list of all the index's for opposing pieces
 		std::vector<unsigned int> takeIndexes;
+
+		//tracks moves for castling and en-passant
+		bool hasMoved;
 	};
 
 }
