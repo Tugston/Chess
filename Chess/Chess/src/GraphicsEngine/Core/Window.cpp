@@ -7,9 +7,9 @@
 
 using namespace GraphicsEngine;
 
-Window::Window() : Window(800.f){}
+Window::Window() : Window(800){}
 
-Window::Window(const float& windowSize)
+Window::Window(const int& windowSize)
 {
 	this->window = SDL_CreateWindow("Chess", 200, 200, windowSize, windowSize, SDL_WINDOW_OPENGL);
 
@@ -33,5 +33,4 @@ Window::~Window()
 {
 	SDL_DestroyWindow(window);
 	SDL_Quit();
-	delete window;
 }

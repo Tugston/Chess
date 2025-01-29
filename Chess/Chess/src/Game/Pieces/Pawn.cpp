@@ -34,69 +34,40 @@ std::vector<glm::vec2> Chess::Pawn::GetAvailableMoves(const glm::vec2& mousePosi
 	const std::vector<glm::vec2>& blackPiecePositions)
 {
 	std::vector<glm::vec2> positions;
-	std::vector<bool> PieceDetection = std::vector<bool>{ false, false, false, false };
+	std::vector<bool> PieceDetection = std::vector<bool>{false, false, false, false};
 	bool canMoveForward = true;
 
-	if (color == WHITE) {
+	int direction = 2 * static_cast<int>(color) - 1;
 
-		//check moves for blocking
-		for (int i = 0; i < blackPiecePositions.size(); i++)
-		{
-			if (blackPiecePositions[i] == glm::vec2(mousePosition.x, mousePosition.y + 1)) {
-				canMoveForward = false;
-			}
+	const std::vector<glm::vec2>& tPos = SortTeamPositions(whitePiecePositions, blackPiecePositions, true);
+	const std::vector<glm::vec2>& oPos = SortTeamPositions(whitePiecePositions, blackPiecePositions, false);
 
+	//check pieces blocking forward progress
+	for (int i = 0; i < tPos.size(); i++)
+		if (tPos[i] == glm::vec2(mousePosition.x, mousePosition.y + direction))
+			canMoveForward = false;
 
-			//left diagonal capture
-			if (blackPiecePositions[i] == glm::vec2(mousePosition.x - 1, mousePosition.y + 1)) {
-				BoundsCheck(glm::vec2(mousePosition.x - 1, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 1);
-			}
+	//adding canMoveForward here just for the short circuit, I know it is kind of counter intuitive for the variable name
+	for (int i = 0; i < oPos.size(); i++) {
+		if (canMoveForward && oPos[i] == glm::vec2(mousePosition.x, mousePosition.y + direction))
+			canMoveForward = false;
 
-			//right diagonal capture
-			if (blackPiecePositions[i] == glm::vec2(mousePosition.x + 1, mousePosition.y + 1)) {
-				BoundsCheck(glm::vec2(mousePosition.x + 1, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 2);
-			}
-		}
-
-		//double move at start
-		if (canMoveForward) {
-			BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y + 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 0);
-
-			if (mousePosition.y == -6) {
-				BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y + 2), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 3);
-			}
-		}
-
-		return positions;
-
-	}
-	else if (color == BLACK) {
-
-		for (int i = 0; i < whitePiecePositions.size(); i++)
-		{
-			if (whitePiecePositions[i] == glm::vec2(mousePosition.x - 1, mousePosition.y - 1)) {
-				BoundsCheck(glm::vec2(mousePosition.x - 1, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 1);
-			}
-
-			if (whitePiecePositions[i] == glm::vec2(mousePosition.x + 1, mousePosition.y - 1)) {
-				BoundsCheck(glm::vec2(mousePosition.x + 1, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 2);
-			}
-		}
-
-		if (canMoveForward) {
-			BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y - 1), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 0);
-
-			if (mousePosition.y == -1) {
-				BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y - 2), positions, whitePiecePositions, blackPiecePositions, PieceDetection, 3);
-			}
-		}
-
-		return positions;
-
+		//check the diagonal captures as well for opposing team
+		if (oPos[i] == glm::vec2(mousePosition.x - 1, mousePosition.y + direction))
+			BoundsCheck(glm::vec2(mousePosition.x - 1, mousePosition.y + direction), positions, tPos, oPos, PieceDetection, 0);
+		if (oPos[i] == glm::vec2(mousePosition.x + 1, mousePosition.y + direction))
+			BoundsCheck(glm::vec2(mousePosition.x + 1, mousePosition.y + direction), positions, tPos, oPos, PieceDetection, 1);
 	}
 
-	//make compiler happy, cause "NoT aLl PaThS rEtUrN a VaLuE!!!!"
-	return std::vector<glm::vec2>();
+	if (canMoveForward) {
+		BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y + direction), positions, tPos, oPos, PieceDetection, 2);
+
+		//the double move start
+		if (!hasMoved)
+			BoundsCheck(glm::vec2(mousePosition.x, mousePosition.y + direction * 2), positions, tPos, oPos, PieceDetection, 3);
+	}
+
+	return positions;
 }
 
 

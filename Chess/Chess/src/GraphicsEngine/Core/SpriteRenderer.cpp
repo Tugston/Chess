@@ -36,8 +36,6 @@ GraphicsEngine::SpriteRenderer::SpriteRenderer()
 	modelMatrix = glm::translate(modelMatrix, glm::vec3(0.f, 7.f, -1.f));
 
 
-	//TEMPORARY STUFF BECAUSE I WILL ADD THIS TO THE SPRITES THEMSELVES
-
 	stbi_set_flip_vertically_on_load(true);
 
 	//setup nearest neighbor texture filetering

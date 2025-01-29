@@ -44,23 +44,24 @@ namespace Chess {
 
 		//setters
 		void SetOffset(glm::vec2 offset);
+		void SetPreCalculatedOffset(glm::vec2 offset);
 		void SetStartOffset(glm::vec2 offset);
+		void SetPreCalculatedStartOffset(glm::vec2 offset);
 		void SetArrayIndex(unsigned int index);
 		void SetHasMoved(bool hasMoved);
 
 		//returns the inherited textureID
 		unsigned int GetTextureID() { return textureID; };
 
-		//returns the array position this piece is at in the sprite renderer array of all sprites
+		//returns based on all sprites
 		unsigned int GetArrayIndex();
 
 		std::vector<unsigned int> GetTakeIndexes() { return takeIndexes; };
 
-		//determines if the position is between offset and boundary
-		//returns true if within bounds
-		bool HitDetection(glm::vec2 position, const bool& whiteTurn);
+		//determines if poistion is the same as this piece start offset
+		bool HitDetection(glm::vec2 position);
 
-		//Set the moves for this piece
+		
 		void SetMoves(glm::vec2 mousePosition, std::vector<glm::vec2>& moveGameStorage, const bool& whiteTurn,
 			const std::vector<glm::vec2>& whitePiecePostions, const std::vector<glm::vec2>& blackPiecePositions);
 
@@ -74,7 +75,7 @@ namespace Chess {
 		std::vector<glm::vec2> GetMoves() { return moves; };
 
 		
-
+		PieceColor GetColor() { return color; };
 
 	protected:
 		//returns all possible moves for each piece
@@ -83,10 +84,13 @@ namespace Chess {
 
 		
 
-		//checks to see if the position is within the board
-		//if it is, returns the position, if not, returns null
-		void BoundsCheck(const glm::vec2& position, std::vector<glm::vec2>& positions, const std::vector<glm::vec2>& whitePiecePositions,
-			const std::vector<glm::vec2>& blackPiecePositions, std::vector<bool>& PieceDetections, unsigned int currentIndex);
+		//checks to see if the position is logical within the board
+		void BoundsCheck(const glm::vec2& position, std::vector<glm::vec2>& positions, const std::vector<glm::vec2>& teamPositions,
+			const std::vector<glm::vec2>& opponentPositions, std::vector<bool>& PieceDetections, unsigned int currentIndex);
+
+		//helper function for the bounds check to recevie the correct teams
+		//bool same team flag; true = same team positions, false = opposing team positions
+		std::vector<glm::vec2> SortTeamPositions(const std::vector<glm::vec2>& whitePositions, const std::vector<glm::vec2>& blackPositions, bool sameTeam);
 
 	protected:
 		//drawing stuff

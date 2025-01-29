@@ -26,13 +26,18 @@ void Chess::BasePiece::SetOffset(glm::vec2 offset)
 	this->offset = offset;
 }
 
+void Chess::BasePiece::SetPreCalculatedOffset(glm::vec2 offset) {
+	this->offset = offset;
+}
+
 void Chess::BasePiece::SetStartOffset(glm::vec2 offset)
 {
 	offset.x = -offset.x - 8;
-
-	
 	this->startingOffset = offset;
-	//boundary = glm::vec2(offset.x + 1, offset.y + 1);
+}
+
+void Chess::BasePiece::SetPreCalculatedStartOffset(glm::vec2 offset) {
+	this->startingOffset = offset;
 }
 
 void Chess::BasePiece::SetArrayIndex(unsigned int index)
@@ -50,16 +55,10 @@ unsigned int Chess::BasePiece::GetArrayIndex()
 	return arrayIndex;	
 }
 
-bool Chess::BasePiece::HitDetection(glm::vec2 position, const bool& whiteTurn)
+bool Chess::BasePiece::HitDetection(glm::vec2 position)
 {
-	//I'll try to fix this later, but the screen and board coords are all messed up so I'm just manually changing them
-	//I have been at this for hours now and can't get it to work
 	position.x = -position.x - 8;
-
-	std::cout << "x: " << position.x << "y: " << position.y << std::endl;
-
 	return position == startingOffset;
-	//return (position.x <= boundary.x && position.y <= boundary.y && position.x >= startingOffset.x && position.y >= startingOffset.y);
 }
 
 
@@ -67,7 +66,6 @@ void Chess::BasePiece::SetMoves(glm::vec2 mousePosition, std::vector<glm::vec2>&
 	const std::vector<glm::vec2>& whitePiecePostions, const std::vector<glm::vec2>& blackPiecePositions)
 {
 	mousePosition.x = -mousePosition.x - 8;
-
 	moves = this->GetAvailableMoves(startingOffset, whitePiecePostions, blackPiecePositions);
 	moveGameStorage = moves;
 }
@@ -82,7 +80,7 @@ bool Chess::BasePiece::GetMoves(glm::vec2 mousePosition, std::vector<glm::vec2>&
 	mousePosition.x = -mousePosition.x - 8;
 	moveGameStorage = moves;
 
-	//extra mouse position check (fixes some bugs that happen every now and then)
+	//returns a mouse poistion check as well
 	for (int i = 0; i < moves.size(); i++)
 	{
 		if (mousePosition == moves[i]) {
@@ -99,75 +97,47 @@ std::vector<glm::vec2> Chess::BasePiece::GetAvailableMoves(const glm::vec2& mous
 	return std::vector<glm::vec2>{};
 }
 
-void Chess::BasePiece::BoundsCheck(const glm::vec2& position, std::vector<glm::vec2>& positions, const std::vector<glm::vec2>& whitePositions,
-	const std::vector<glm::vec2>& blackPositions, std::vector<bool>& PieceDetections, unsigned int currentIndex)
+void Chess::BasePiece::BoundsCheck(const glm::vec2& position, std::vector<glm::vec2>& positions, const std::vector<glm::vec2>& teamPositions,
+	const std::vector<glm::vec2>& opponentPositions, std::vector<bool>& PieceDetections, unsigned int currentIndex)
 {
+
 	//just tracks if the current position has already been determined to be clear
 	bool positionPushedBack = false;
 
-	//check if this branch has already resulted in finding a piece
 	if (!PieceDetections[currentIndex]) {
-		if (color == WHITE) {
-			//if white piece loop has same spot, then don't push back the position, and set the PieceDetection index to true
-			//if black piece loop has same spot, then push back that position, and set the PieceDetection index to true
 
-			//loop through all the white pieces
-			for (int i = 0; i < whitePositions.size(); i++) {
-				if (whitePositions[i] == position) {
-					PieceDetections[currentIndex] = true;
-					positionPushedBack = true;
-					break;
-				}
+		//dont add position if its the same team
+		for (int i = 0; i < teamPositions.size(); i++)
+			if (teamPositions[i] == position) {
+				PieceDetections[currentIndex] = true;
+				positionPushedBack = true;
+				break;
 			}
 
-			//loop through all the black pieces
-			if (!positionPushedBack) {
-				for (int i = 0; i < blackPositions.size(); i++) {
-					if (blackPositions[i] == position) {
-						PieceDetections[currentIndex] = true;
-						positions.push_back(position);
-						positionPushedBack = true;
-						takeIndexes.push_back(i);
-						break;
-					}
-				}
-			}
-
-
-		}
-		else {
-			// do the same for black but flipped
-
-			for (int i = 0; i < whitePositions.size(); i++) {
-				if (whitePositions[i] == position) {
+		if(!positionPushedBack)
+			for (int i = 0; i < opponentPositions.size(); i++)
+				if (opponentPositions[i] == position) {
 					PieceDetections[currentIndex] = true;
 					positions.push_back(position);
-					positionPushedBack = true;
 					takeIndexes.push_back(i);
-					break;
+					positionPushedBack = true;
 				}
-			}
-
-			if (!positionPushedBack) {
-				for (int i = 0; i < blackPositions.size(); i++)
-				{
-					if (blackPositions[i] == position) {
-						PieceDetections[currentIndex] = true;
-						positionPushedBack = true;
-						break;
-					}
-				}
-			}
-		}
-
 
 
 		//if the position is just an empty space
 		if (!positionPushedBack && position.x >= 0 && position.y <= 0 && position.x <= 7 && position.y >= -7)
-		{
 			positions.push_back(position);
-		}
+
 	}
+	
+}
+
+std::vector<glm::vec2> Chess::BasePiece::SortTeamPositions(const std::vector<glm::vec2>& whitePositions,
+	const std::vector<glm::vec2>& blackPositions, bool sameTeam) {
+	if (sameTeam)
+		return (color == WHITE) ? whitePositions : blackPositions;
+	else
+		return (color == WHITE) ? blackPositions : whitePositions;
 }
 
 

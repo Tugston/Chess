@@ -18,6 +18,7 @@
 
 //_________GAME INCLUDES________
 #include "../Game/Board.h"
+#include "../Game/Pieces/BaseChessPiece.h"
 
 
 //_________CORE INCLUDES________
@@ -58,7 +59,6 @@ namespace Chess {
 		void CapturePiece(int x, int y);
 
 		glm::vec2 CastleCheck(Chess::BasePiece* kingPiece);
-		bool CheckCastlingClear(int rookIndex, Chess::BasePiece* kingPiece, bool leftCheck);
 		void MakeCastlingMove(Chess::BasePiece* kingPiece, glm::vec2 mousePos, glm::vec2 rookIndexes);
 
 
@@ -68,12 +68,19 @@ namespace Chess {
 		std::vector<glm::vec2> GetPiecePositions(Turn turn);
 		
 		
+		void DropPiece();
+		void PickupPiece();
+		void CancelMove();
+		void MovePieceWithMouse();
 
 
-
+		std::vector<Chess::BasePiece*>* GetTeamPieces(Turn teamPieces);
+		std::vector<Chess::BasePiece*>* GetOpponentPieces(Turn teamPieces);
 
 		void PrintPieceMovesAtMousePos(glm::vec2 mousePosition);
 		void PrintVec2Data(glm::vec2 x, std::string name);
+
+		Chess::BasePiece* CreatePiece(Chess::PieceType type, Chess::PieceColor color, const glm::vec2& pos, int index);
 
 	private:
 
@@ -102,5 +109,12 @@ namespace Chess {
 
 		//all the moves a piece can go to when you pick it up
 		std::vector<glm::vec2> moves;
+
+
+		//mouse x and y position
+		int x, y;
+
+		//stores the rook positions for castling
+		glm::vec2 currentRookIndex = glm::vec2{ -1,-1 };
 	};
 }
