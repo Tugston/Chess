@@ -3,7 +3,7 @@
 #include<iostream>
 
 Chess::Pawn::Pawn(PieceColor color, glm::vec2 screenPosition, const unsigned int& arrayIndex) 
-	: BasePiece(PAWN, color, screenPosition, arrayIndex)
+	: BasePiece(PAWN, color, screenPosition, arrayIndex), justDoubleMoved(false)
 {
 	if (color == WHITE) {
 		textureID = 10;
@@ -28,6 +28,23 @@ void Chess::Pawn::DeSelected()
 std::string Chess::Pawn::GetTypeName()
 {
 	return "Pawn";
+}
+
+int Chess::Pawn::enPassant(glm::vec2 lastPieceMove, std::vector<BasePiece*>* opponentPieces){
+
+	if (lastPieceMove == this->GetStartOffset()) {
+
+	}
+
+	return 0;
+}
+
+void Chess::Pawn::SetDoubleMoved(bool justDoubleMoved){
+	this->justDoubleMoved = justDoubleMoved;
+}
+
+bool Chess::Pawn::GetDoubleMoved(){
+	return justDoubleMoved;
 }
 
 std::vector<glm::vec2> Chess::Pawn::GetAvailableMoves(const glm::vec2& mousePosition, const std::vector<glm::vec2>& whitePiecePositions,
